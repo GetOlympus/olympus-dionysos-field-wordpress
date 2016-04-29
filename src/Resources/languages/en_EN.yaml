@@ -1,0 +1,6 @@
+# Main component
+wordpress:
+  title: WordPress contents
+  description: "Press the <code>CTRL</code> or <code>CMD</code> button to select more than one option."
+  no_items_found: "There are no %s found."
+  no_item_found: "There is no %s found."
