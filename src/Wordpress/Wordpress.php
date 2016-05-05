@@ -2,8 +2,8 @@
 
 namespace GetOlympus\Field;
 
-use GetOlympus\Hera\Controllers\Field;
-use GetOlympus\Hera\Controllers\Translate;
+use GetOlympus\Hera\Field\Controller\Field;
+use GetOlympus\Hera\Translate\Controller\Translate;
 
 /**
  * Builds Wordpress field.
@@ -42,7 +42,7 @@ class Wordpress extends Field
         // Build defaults
         $defaults = [
             'id' => '',
-            'title' => Translate::t('wordpress.title'),
+            'title' => Translate::t('wordpress.title', [], 'wordpressfield'),
             'default' => [],
             'description' => '',
             'mode' => 'posts',
@@ -75,14 +75,14 @@ class Wordpress extends Field
         // Field description
         if (!empty($vars['contents']) && 1 <= count($vars['contents'])) {
             $description = $vars['multiple'] 
-                ? Translate::t('wordpress.description').'<br/>' 
+                ? Translate::t('wordpress.description', [], 'wordpressfield').'<br/>' 
                 : '';
         }
         else if ($vars['multiple']) {
-            $description = sprintf(Translate::t('wordpress.no_items_found'), $vars['mode']).'<br/>';
+            $description = sprintf(Translate::t('wordpress.no_items_found', [], 'wordpressfield'), $vars['mode']).'<br/>';
         }
         else {
-            $description = sprintf(Translate::t('wordpress.no_item_found'), $vars['mode']).'<br/>';
+            $description = sprintf(Translate::t('wordpress.no_item_found', [], 'wordpressfield'), $vars['mode']).'<br/>';
         }
 
         // Update description
