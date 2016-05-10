@@ -1,6 +1,6 @@
 {% set twigtpl = template and template == 'terms' ? 'terms' : 'pages' %}
 
-{% extends "Layouts/Extends/" ~ twigtpl ~ ".html.twig" %}
+{% extends "@template/Layouts/Extends/" ~ twigtpl ~ ".html.twig" %}
 
 {% block id %}{{ id }}_wordpress_{{ mode }}{% endblock %}
 {% block label %}<label for="{{ id }}">{{ title|raw }}</label>{% endblock %}
