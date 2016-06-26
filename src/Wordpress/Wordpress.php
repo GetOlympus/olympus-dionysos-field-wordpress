@@ -20,22 +20,19 @@ use GetOlympus\Hera\Translate\Controller\Translate;
 class Wordpress extends Field
 {
     /**
-     * @var string
+     * Prepare variables.
      */
-    protected $faIcon = 'fa-wordpress';
-
-    /**
-     * @var string
-     */
-    protected $template = 'wordpress.html.twig';
+    protected function setVars()
+    {
+        $this->getModel()->setFaIcon('fa-wordpress');
+        $this->getModel()->setTemplate('wordpress.html.twig');
+    }
 
     /**
      * Prepare HTML component.
      *
      * @param array $content
      * @param array $details
-     *
-     * @since 0.0.1
      */
     protected function getVars($content, $details = [])
     {
@@ -49,20 +46,19 @@ class Wordpress extends Field
             'multiple' => false,
             'options' => [],
 
-            // details
-            'post' => 0,
-            'prefix' => '',
-            'template' => 'pages',
+            // Texts
+            't_items' => Translate::t('wordpress.items', [], 'wordpressfield'),
         ];
 
         // Build defaults data
         $vars = array_merge($defaults, $content);
 
         // Check if an id is defined at least
-        $postid = empty($vars['post']) ? 0 : $vars['post']->ID;
+        $postid = !isset($details['post_id']) ? 0 : $details['post_id'];
 
         // Retrieve field value
-        $vars['val'] = $this->getValue($details, $vars['default'], $content['id'], true);
+        $vars['val'] = $this->getValue($content['id'], $details, $vars['default']);
+        $vars['val'] = !is_array($vars['val']) ? [$vars['val']] : $vars['val'];
 
         // Get the categories
         $vars['contents'] = $this->getWPContents(
@@ -74,44 +70,32 @@ class Wordpress extends Field
 
         // Field description
         if (!empty($vars['contents']) && 1 <= count($vars['contents'])) {
-            $description = $vars['multiple'] 
-                ? Translate::t('wordpress.description', [], 'wordpressfield').'<br/>' 
-                : '';
-        }
-        else if ($vars['multiple']) {
-            $description = sprintf(Translate::t('wordpress.no_items_found', [], 'wordpressfield'), $vars['mode']).'<br/>';
-        }
-        else {
-            $description = sprintf(Translate::t('wordpress.no_item_found', [], 'wordpressfield'), $vars['mode']).'<br/>';
+            $description = $vars['multiple'] ? Translate::t('wordpress.description', [], 'wordpressfield').'<br/>' : '';
+        } else {
+            $translate = $vars['multiple'] ? 'wordpress.no_items_found' : 'wordpress.no_item_found';
+            $description = sprintf(Translate::t($translate, [], 'wordpressfield'), $vars['mode']).'<br/>';
         }
 
         // Update description
-        $vars['description'] = $description . $vars['description'];
+        $vars['description'] = $description.$vars['description'];
 
         // Update vars
-        $this->getField()->setVars($vars);
+        $this->getModel()->setVars($vars);
     }
 
     /**
      * Get Wordpress contents already registered.
      *
-     * @param string $type Wordpress content type to return
-     * @param bool $multiple Define if there is multiselect or not
-     * @param array $options Define options if needed
-     * @param int $post Define the post ID for meta boxes
-     * @return array $wpcontents Array of Wordpress content type registered
-     *
-     * @since 0.0.1
+     * @param   string  $type       Wordpress content type to return
+     * @param   boolean $multiple   Define if there is multiselect or not
+     * @param   array   $options    Define options if needed
+     * @param   integer $post_id    Define the post ID for meta boxes
+     * @return  array   $wpcontents Array of Wordpress content type registered
      */
-    protected function getWPContents($type = 'posts', $multiple = false, $options = [], $post = 0)
+    protected function getWPContents($type = 'posts', $multiple = false, $options = [], $post_id = 0)
     {
         // Access WordPress contents
         $wpcontents = [];
-
-        // Set the first item
-        if (!$multiple) {
-            $wpcontents[0][-1] = '';
-        }
 
         // Exclude current item
         if (isset($options['exclude']) && 'current' === $options['exclude']) {
@@ -129,33 +113,31 @@ class Wordpress extends Field
             'terms', 'term'
         ];
 
-        // Data retrieed
-        if (in_array($type, $authorized)) {
-            if (in_array($type, ['categories', 'category'])) {
-                $wptype = 'Categories';
-            }
-            else if (in_array($type, ['menus', 'menu'])) {
-                $wptype = 'Menus';
-            }
-            else if (in_array($type, ['pages', 'page'])) {
-                $wptype = 'Pages';
-            }
-            else if (in_array($type, ['posts', 'post'])) {
-                $wptype = 'Posts';
-            }
-            else if (in_array($type, ['posttypes', 'posttype'])) {
-                $wptype = 'Posttypes';
-            }
-            else if (in_array($type, ['tags', 'tag'])) {
-                $wptype = 'Tags';
-            }
-            else {
-                $wptype = 'Terms';
-            }
-
-            $function = 'getWP'.$wptype;
-            $wpcontents = array_merge($wpcontents, $this->$function($options));
+        // Check contents
+        if (!in_array($type, $authorized)) {
+            return [];
         }
+
+        // Data retrieved
+        if (in_array($type, ['categories', 'category'])) {
+            $wptype = 'Categories';
+        } else if (in_array($type, ['menus', 'menu'])) {
+            $wptype = 'Menus';
+        } else if (in_array($type, ['pages', 'page'])) {
+            $wptype = 'Pages';
+        } else if (in_array($type, ['posts', 'post'])) {
+            $wptype = 'Posts';
+        } else if (in_array($type, ['posttypes', 'posttype'])) {
+            $wptype = 'Posttypes';
+        } else if (in_array($type, ['tags', 'tag'])) {
+            $wptype = 'Tags';
+        } else {
+            $wptype = 'Terms';
+        }
+
+        // Get contents
+        $function = 'getWP'.$wptype;
+        $wpcontents = $this->$function($options);
 
         // Return value
         return $wpcontents;
@@ -166,21 +148,19 @@ class Wordpress extends Field
      *
      * @uses get_categories()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPCategories($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.category', [], 'wordpressfield');
 
         // Build options
-        $request = [
+        $args = array_merge([
             'hide_empty' => 0
-        ];
-        $args = array_merge($request, $options);
+        ], $options);
 
         // Build request
         $categories_obj = get_categories($args);
@@ -194,7 +174,7 @@ class Wordpress extends Field
                 }
 
                 // Get the id and the name
-                $contents[$cat->cat_ID] = $cat->cat_name;
+                $contents[0][$cat->cat_ID] = $cat->cat_name;
             }
         }
 
@@ -207,22 +187,20 @@ class Wordpress extends Field
      *
      * @uses wp_get_nav_menus()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPMenus($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.menu', [], 'wordpressfield');
 
         // Build options
-        $request = [
+        $args = array_merge([
             'hide_empty' => false,
             'orderby' => 'none'
-        ];
-        $args = array_merge($request, $options);
+        ], $options);
 
         // Build request
         $menus_obj = wp_get_nav_menus($args);
@@ -249,21 +227,19 @@ class Wordpress extends Field
      *
      * @uses get_pages()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPPages($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.page', [], 'wordpressfield');
 
         // Build options
-        $request = [
+        $args = array_merge([
             'sort_column' => 'post_parent,menu_order'
-        ];
-        $args = array_merge($request, $options);
+        ], $options);
 
         // Build request
         $pages_obj = get_pages($args);
@@ -290,22 +266,20 @@ class Wordpress extends Field
      *
      * @uses wp_get_recent_posts()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPPosts($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.post', [], 'wordpressfield');
 
         // Build options
-        $request = [
-            'post_type' => isset($options['post_type']) ? $options['post_type'] : 'post',
+        $args = array_merge([
+            'post_type' => 'post',
             'post_status' => 'publish'
-        ];
-        $args = array_merge($request, $options);
+        ], $options);
 
         // Build request
         $posts_obj = wp_get_recent_posts($args, OBJECT);
@@ -332,19 +306,17 @@ class Wordpress extends Field
      *
      * @uses get_post_types()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPPosttypes($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.posttype', [], 'wordpressfield');
 
         // Build options
-        $request = [];
-        $args = array_merge($request, $options);
+        $args = array_merge([], $options);
 
         // Build request
         $types_obj = get_post_types($args, 'object');
@@ -366,19 +338,17 @@ class Wordpress extends Field
      *
      * @uses get_the_tags()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPTags($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.tag', [], 'wordpressfield');
 
         // Build options
-        $request = [];
-        $args = array_merge($request, $options);
+        $args = array_merge([], $options);
 
         // Build request
         $tags_obj = get_the_tags();
@@ -400,21 +370,19 @@ class Wordpress extends Field
      *
      * @uses get_terms()
      *
-     * @param array $options Define options if needed
-     * @return array $wpcontents Array of WordPress items
-     *
-     * @since 0.0.1
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
      */
     protected function getWPTerms($options = [])
     {
         // Build contents
         $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.term', [], 'wordpressfield');
 
         // Build options
-        $request = [
+        $args = array_merge([
             'public' => 1
-        ];
-        $args = array_merge($request, $options);
+        ], $options);
 
         // Build request
         $taxs_obj = get_taxonomies($args);

@@ -2,5 +2,14 @@
 wordpress:
   title: WordPress contents
   description: "Press the <code>CTRL</code> or <code>CMD</code> button to select more than one option."
+  items: Items
   no_items_found: "There are no %s found."
   no_item_found: "There is no %s found."
+  choose:
+    category: Choose a category
+    menu: Choose a menu
+    page: Choose a page
+    post: Choose a post
+    posttype: Choose a posttype
+    tag: Choose a tag
+    ter: Choose a ter
