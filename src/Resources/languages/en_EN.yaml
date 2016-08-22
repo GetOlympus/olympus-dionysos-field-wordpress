@@ -12,4 +12,4 @@ wordpress:
     post: Choose a post
     posttype: Choose a posttype
     tag: Choose a tag
-    ter: Choose a ter
+    term: Choose a term
