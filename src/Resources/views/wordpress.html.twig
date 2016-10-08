@@ -9,8 +9,8 @@
             {% set squares = multiple ? '[]' : '' %}
             {% set attributes = multiple ? ' multiple="true" size="5" data-value="' ~ val|join(',') ~ '"' : '' %}
 
-            <input type="hidden" name="{{ id }}{{ squares }}" value="" />
-            <select name="{{ id }}{{ squares }}" id="{{ id }}"{{ attributes }}>
+            <input type="hidden" name="{{ name }}{{ squares }}" value="" />
+            <select name="{{ name }}{{ squares }}" id="{{ id }}"{{ attributes }}>
                 {% for key, option in contents %}
                     {% if key == -1 %}
                         <option value="">{{ option }}</option>
