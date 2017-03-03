@@ -12,4 +12,5 @@ wordpress:
     post: Choose a post
     posttype: Choose a posttype
     tag: Choose a tag
+    taxonomy: Choose a taxonomy
     term: Choose a term

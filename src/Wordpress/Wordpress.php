@@ -110,6 +110,7 @@ class Wordpress extends Field
             'posts', 'post',
             'posttypes', 'posttype',
             'tags', 'tag',
+            'taxonomies', 'taxonomy',
             'terms', 'term'
         ];
 
@@ -131,6 +132,8 @@ class Wordpress extends Field
             $wptype = 'Posttypes';
         } else if (in_array($type, ['tags', 'tag'])) {
             $wptype = 'Tags';
+        } else if (in_array($type, ['taxonomies', 'taxonomy'])) {
+            $wptype = 'Taxonomies';
         } else {
             $wptype = 'Terms';
         }
@@ -366,18 +369,19 @@ class Wordpress extends Field
     }
 
     /**
-     * Get WordPress Terms registered.
+     * Get WordPress Taxonomies registered.
      *
-     * @uses get_terms()
+     * @uses get_taxonomies()
+     * @uses get_taxonomy()
      *
      * @param   array $options      Define options if needed
      * @return  array $wpcontents   Array of WordPress items
      */
-    protected function getWPTerms($options = [])
+    protected function getWPTaxonomies($options = [])
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.term', [], 'wordpressfield');
+        $contents[-1] = Translate::t('wordpress.choose.taxonomy', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([
@@ -393,6 +397,40 @@ class Wordpress extends Field
                 // Get the id and the name
                 $taxo = get_taxonomy($tax);
                 $contents[0][$tax] = $taxo->labels->name.' ('.$taxo->name.')';
+            }
+        }
+
+        // Return all values in a well formatted way
+        return $contents;
+    }
+
+    /**
+     * Get WordPress Terms registered.
+     *
+     * @uses get_terms()
+     *
+     * @param   array $options      Define options if needed
+     * @return  array $wpcontents   Array of WordPress items
+     */
+    protected function getWPTerms($options = [])
+    {
+        // Build contents
+        $contents = [];
+        $contents[-1] = Translate::t('wordpress.choose.term', [], 'wordpressfield');
+
+        // Build options
+        $args = array_merge([
+            'hide_empty' => false,
+        ], $options);
+
+        // Build request
+        $terms_obj = get_terms($args);
+
+        // Iterate on tags
+        if (!empty($terms_obj) && ! is_wp_error($terms_obj)) {
+            foreach ($terms_obj as $term) {
+                // Get the id and the name
+                $contents[0][$term->term_id] = $term->name;
             }
         }
 
