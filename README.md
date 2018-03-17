@@ -1,6 +1,6 @@
 # Wordpress Field ![For Olympus](https://img.shields.io/badge/for-Olympus-44cc11.svg?style=flat-square) ![For WordPress](https://img.shields.io/badge/for-WordPress-00aadc.svg?style=flat-square)
 
-_This component is a part of the [**Olympus Hera**](https://github.com/crewstyle/OlympusHera) **WordPress** library._  
+_This component is a part of the [**Olympus Zeus Core**](https://github.com/GetOlympus/Zeus-Core) **WordPress** framework._  
 
 ![Thumbnail](https://www.filepicker.io/api/file/CG0OlwGaSH2W1d2o8jvW)
 
@@ -10,7 +10,7 @@ _This component is a part of the [**Olympus Hera**](https://github.com/crewstyle
 
   + [Documentation](https://olympus.readme.io/v1.0/docs/wordpress-field)
   + [Report issues](https://github.com/GetOlympus/olympus-wordpress-field/issues)
-  + [Olympus Hera](https://github.com/crewstyle/OlympusHera)
+  + [Olympus Zeus Core](https://github.com/GetOlympus/Zeus-Core)
 
 ---
 

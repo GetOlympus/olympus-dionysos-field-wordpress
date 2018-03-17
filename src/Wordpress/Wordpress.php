@@ -2,8 +2,8 @@
 
 namespace GetOlympus\Field;
 
-use GetOlympus\Hera\Field\Controller\Field;
-use GetOlympus\Hera\Translate\Controller\Translate;
+use GetOlympus\Zeus\Field\Controller\Field;
+use GetOlympus\Zeus\Translate\Controller\Translate;
 
 /**
  * Builds Wordpress field.
