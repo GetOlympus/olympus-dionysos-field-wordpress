@@ -23,7 +23,7 @@
   },
   "minimum-stability": "stable",
   "require": {
-    "getolympus/olympus-zeus-core": "~0.0.1",
+    "getolympus/olympus-zeus-core": "~1.1",
     "twig/twig": "~1.0"
   },
   "require-dev": {
