@@ -1,32 +1,62 @@
 {% extends template_path %}
 
-{% block id %}{{ id }}_wordpress_{{ mode }}{% endblock %}
-{% block label %}<label for="{{ id }}">{{ title|raw }}</label>{% endblock %}
+{% block id %}{{ identifier }}{% endblock %}
+{% block label %}<label>{{ title|raw }}</label>{% endblock %}
 
 {% block field %}
-    <div class="olh-field-content wordpress {{ mode }}">
-        {% if contents and contents|length >= 1 %}
-            {% set squares = multiple ? '[]' : '' %}
-            {% set attributes = multiple ? ' multiple="true" size="5" data-value="' ~ val|join(',') ~ '"' : '' %}
+    <div id="{{ identifier }}-wp" class="olz-field wordpress {{ type }} categorydiv">
+        <input type="hidden" name="{{ name }}" value="" />
 
-            <input type="hidden" name="{{ name }}{{ squares }}" value="" />
-            <select name="{{ name }}{{ squares }}" id="{{ id }}"{{ attributes }}>
-                {% for key, option in contents %}
-                    {% if key == -1 %}
-                        <option value="">{{ option }}</option>
-                    {% else %}
-                        <optgroup label="{{ key ? key|capitalize : t_items }}">
-                            {% for k, opt in option %}
-                                {% set sel = k in val ? true : false %}
-                                <option value="{{ k }}"{{ sel ? ' selected="selected"' : '' }}>{{ opt }}</option>
-                            {% endfor %}
-                        </optgroup>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        {% endif %}
+        <ul class="category-tabs">
+            <li class="tabs">
+                <a href="#{{ identifier }}-recent">{{ t_mostused }}</a>
+            </li>
+        </ul>
+
+        <div id="{{ identifier }}-recent" class="tabs-panel">
+            {% if contents and contents|length >= 1 %}
+                {% set squares = multiple ? '[]' : '' %}
+                {% set type = multiple ? 'checkbox' : 'radio' %}
+
+                <ul id="{{ identifier }}checklist-most-recent" data-wp-lists="list:{{ identifier }}" class="categorychecklist">
+
+                    {% for k, val in contents %}
+                        {% set selected = k in value ? true : false %}
+                        <li id="{{ identifier }}-{{ k }}" class="popular-category">
+                            <label class="selectit">
+                                <input type="{{ type }}" name="{{ name }}{{ squares }}" id="in-{{ identifier }}-{{ k }}" value="{{ k }}"{{ selected ? ' checked="checked"' : '' }} /> {{ val }}
+                            </label>
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            {% endif %}
+        </div>
+
+        {#<script>
+            (function($) {
+                $(document).ready(function() {
+                    $("#{{ identifier }}-wp").zeusTabs({
+                        identifier: "{{ identifier }}",
+                        lists: {
+                            search: "{{ t_search|raw }}",
+                        },
+                        type: "{{ type }}"
+                    });
+                });
+            })(jQuery);
+        </script>#}
     </div>
 {% endblock %}
+
+{# block footer %}
+    <script type="text/html" id="tmpl-{{ identifier }}-search">
+        {% include '@wordpress/search.html.twig' with {
+            'id': identifier,
+            'label': t_search,
+        } only %}
+    </script>
+{% endblock #}
 
 {% block description %}
     {{ description|raw }}

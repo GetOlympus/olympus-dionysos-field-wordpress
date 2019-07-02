@@ -20,69 +20,100 @@ use GetOlympus\Zeus\Translate\Controller\Translate;
 class Wordpress extends Field
 {
     /**
-     * Prepare variables.
+     * @var array
      */
-    protected function setVars()
+    //protected $adminscripts = ['wp-lists', 'zeus-tabs'];
+
+    /**
+     * @var string
+     */
+    protected $template = 'wordpress.html.twig';
+
+    /**
+     * @var string
+     */
+    protected $textdomain = 'wordpressfield';
+
+    /**
+     * Prepare defaults.
+     *
+     * @return array
+     */
+    protected function getDefaults()
     {
-        $this->getModel()->setFaIcon('fa-wordpress');
-        $this->getModel()->setTemplate('wordpress.html.twig');
+        return [
+            'title' => Translate::t('wordpress.title', $this->textdomain),
+            'default' => [],
+            'description' => '',
+            'field' => 'ID',
+            'multiple' => false,
+            'type' => 'post',
+            'settings' => [],
+
+            // Texts
+            't_all' => Translate::t('wordpress.all', $this->textdomain),
+            't_items' => Translate::t('wordpress.items', $this->textdomain),
+            't_mostused' => Translate::t('wordpress.most_used', $this->textdomain),
+            't_search' => Translate::t('wordpress.search', $this->textdomain),
+        ];
     }
 
     /**
-     * Prepare HTML component.
+     * Prepare variables.
      *
-     * @param array $content
-     * @param array $details
+     * @param  object  $value
+     * @param  array   $contents
+     *
+     * @return array
      */
-    protected function getVars($content, $details = [])
+    protected function getVars($value, $contents)
     {
-        // Build defaults
-        $defaults = [
-            'id' => '',
-            'title' => Translate::t('wordpress.title', [], 'wordpressfield'),
-            'default' => [],
-            'description' => '',
-            'mode' => 'posts',
-            'multiple' => false,
-            'options' => [],
-            'value' => '',
-
-            // Texts
-            't_items' => Translate::t('wordpress.items', [], 'wordpressfield'),
+        // Available types
+        $types = [
+            'categories' => 'category',
+            'category' => 'category',
+            'menus' => 'menu',
+            'menu' => 'menu',
+            'pages' => 'page',
+            'page' => 'page',
+            'posts' => 'post',
+            'post' => 'post',
+            'posttypes' => 'posttype',
+            'posttype' => 'posttype',
+            'tags' => 'tag',
+            'tag' => 'tag',
+            'taxonomies' => 'taxonomy',
+            'taxonomy' => 'taxonomy',
+            'terms' => 'term',
+            'term' => 'term'
         ];
 
-        // Build defaults data
-        $vars = array_merge($defaults, $content);
-
-        // Check if an id is defined at least
-        $postid = !isset($details['post_id']) ? 0 : $details['post_id'];
+        // Get contents
+        $vars = $contents;
 
         // Retrieve field value
-        $vars['val'] = $this->getValue($content['id'], $details, $vars['default']);
-        $vars['val'] = !is_array($vars['val']) ? [$vars['val']] : $vars['val'];
+        $vars['value'] = !is_array($value) ? [$value] : $value;
+
+        // Check types
+        $vars['type'] = array_key_exists($vars['type'], $types) ? $types[$vars['type']] : 'post';
 
         // Get the categories
         $vars['contents'] = $this->getWPContents(
-            $vars['mode'],
+            $vars['type'],
             $vars['multiple'],
-            $vars['options'],
-            $postid,
-            $vars['value']
+            $vars['settings'],
+            $vars['value'],
+            $vars['field']
         );
 
         // Field description
-        if (!empty($vars['contents']) && 1 <= count($vars['contents'])) {
-            $description = $vars['multiple'] ? Translate::t('wordpress.description', [], 'wordpressfield').'<br/>' : '';
-        } else {
+        if (empty($vars['contents'])) {
             $translate = $vars['multiple'] ? 'wordpress.no_items_found' : 'wordpress.no_item_found';
-            $description = sprintf(Translate::t($translate, [], 'wordpressfield'), $vars['mode']).'<br/>';
+            $vars['description'] = sprintf(Translate::t($translate, $this->textdomain), $vars['mode']).'<br/>'.$vars['description'];
         }
 
-        // Update description
-        $vars['description'] = $description.$vars['description'];
-
         // Update vars
-        $this->getModel()->setVars($vars);
+        return $vars;
     }
 
     /**
@@ -90,52 +121,35 @@ class Wordpress extends Field
      *
      * @param   string  $type       Wordpress content type to return
      * @param   boolean $multiple   Define if there is multiselect or not
-     * @param   array   $options    Define options if needed
+     * @param   array   $settings   Define settings if needed
      * @param   integer $post_id    Define the post ID for meta boxes
-     * @param   string  $value      Define the value of each select options
+     * @param   string  $field      Define the value of each select options
      * @return  array   $wpcontents Array of Wordpress content type registered
      */
-    protected function getWPContents($type = 'posts', $multiple = false, $options = [], $post_id = 0, $value = '')
+    protected function getWPContents($type = 'post', $multiple = false, $settings = [], $post_id = 0, $field = '')
     {
         // Access WordPress contents
         $wpcontents = [];
 
         // Exclude current item
-        if (isset($options['exclude']) && 'current' === $options['exclude']) {
-            $options['exclude'] = $post;
-        }
-
-        // Get asked contents
-        $authorized = [
-            'categories', 'category',
-            'menus', 'menu',
-            'pages', 'page',
-            'posts', 'post',
-            'posttypes', 'posttype',
-            'tags', 'tag',
-            'taxonomies', 'taxonomy',
-            'terms', 'term'
-        ];
-
-        // Check contents
-        if (!in_array($type, $authorized)) {
-            return [];
+        if (isset($settings['exclude']) && 'current' === $settings['exclude']) {
+            $settings['exclude'] = $post;
         }
 
         // Data retrieved
-        if (in_array($type, ['categories', 'category'])) {
+        if ('category' === $type) {
             $wptype = 'Categories';
-        } else if (in_array($type, ['menus', 'menu'])) {
+        } else if ('menu' === $type) {
             $wptype = 'Menus';
-        } else if (in_array($type, ['pages', 'page'])) {
+        } else if ('page' === $type) {
             $wptype = 'Pages';
-        } else if (in_array($type, ['posts', 'post'])) {
+        } else if ('post' === $type) {
             $wptype = 'Posts';
-        } else if (in_array($type, ['posttypes', 'posttype'])) {
+        } else if ('posttype' === $type) {
             $wptype = 'Posttypes';
-        } else if (in_array($type, ['tags', 'tag'])) {
+        } else if ('tag' === $type) {
             $wptype = 'Tags';
-        } else if (in_array($type, ['taxonomies', 'taxonomy'])) {
+        } else if ('taxonomy' === $type) {
             $wptype = 'Taxonomies';
         } else {
             $wptype = 'Terms';
@@ -143,7 +157,7 @@ class Wordpress extends Field
 
         // Get contents
         $function = 'getWP'.$wptype;
-        $wpcontents = $this->$function($options, $value);
+        $wpcontents = $this->$function($settings, $field);
 
         // Return value
         return $wpcontents;
@@ -154,22 +168,21 @@ class Wordpress extends Field
      *
      * @uses get_categories()
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param   array   $options    Define options if needed
+     * @param   string  $field      Define the value of each select options
+     * @param   array   $contents   Define all already set contents
+     * @param   integer $parent     Define parent category
+     * @param   string  $prefix     Define text to display before name
+     * @return  array   $wpcontents Array of WordPress items
      */
-    protected function getWPCategories($options = [], $value = 'cat_ID')
+    protected function getWPCategories($options = [], $field = 'cat_ID', $contents = [], $parent = 0, $prefix = '')
     {
-        // Build contents
-        $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.category', [], 'wordpressfield');
-
         // Build options
         $args = array_merge([
             'hide_empty' => 0,
             'orderby' => 'name',
             'order' => 'ASC',
-            'parent' => 0,
+            'parent' => $parent,
         ], $options);
 
         // Build request
@@ -183,58 +196,14 @@ class Wordpress extends Field
                     continue;
                 }
 
-                // Check value
-                $item = !empty($value) && isset($cat->$value) ? $cat->$value : $cat->cat_ID;
+                // Check field
+                $item = !empty($field) && isset($cat->$field) ? $cat->$field : $cat->cat_ID;
 
                 // Get the id and the name
-                $contents[0][$item] = $cat->cat_name;
+                $contents[$item] = $prefix.$cat->cat_name;
 
                 // Get children
-                $contents = $this->getWPSubCategories($contents, $cat->cat_ID, $value);
-            }
-        }
-
-        // Return all values in a well formatted way
-        return $contents;
-    }
-
-    /**
-     * Get WordPress Sub Categories registered.
-     *
-     * @uses get_categories()
-     *
-     * @param   array   $contents   Define all already set contents
-     * @param   integer $parent     Define parent category
-     * @param   string  $value      Define the value of each select options
-     * @param   string  $prefix     Define text to display before name
-     * @return  array   $wpcontents Array of WordPress items
-     */
-    protected function getWPSubCategories($contents = [], $parent = 0, $value = 'cat_ID', $prefix = '— ')
-    {
-        // Build request
-        $categories_obj = get_categories([
-            'hide_empty' => 0,
-            'orderby' => 'name',
-            'order' => 'ASC',
-            'parent' => $parent,
-        ]);
-
-        // Iterate on categories
-        if (!empty($categories_obj)) {
-            foreach ($categories_obj as $cat) {
-                // For Wordpress version < 3.0
-                if (empty($cat->cat_ID)) {
-                    continue;
-                }
-
-                // Check value
-                $item = !empty($value) && isset($cat->$value) ? $cat->$value : $cat->cat_ID;
-
-                // Get the id and the name
-                $contents[0][$item] = $prefix.$cat->cat_name;
-
-                // Get children
-                $contents = $this->getWPSubCategories($contents, $cat->cat_ID, $value, $prefix.'— ');
+                $contents = $this->getWPCategories($options, $field, $contents, $cat->cat_ID, $prefix.'- ');
             }
         }
 
@@ -248,14 +217,13 @@ class Wordpress extends Field
      * @uses wp_get_nav_menus()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPMenus($options = [], $value = 'term_id')
+    protected function getWPMenus($options = [], $field = 'term_id')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.menu', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([
@@ -274,11 +242,11 @@ class Wordpress extends Field
                     continue;
                 }
 
-                // Check value
-                $item = !empty($value) && isset($menu->$value) ? $menu->$value : $menu->term_id;
+                // Check field
+                $item = !empty($field) && isset($menu->$field) ? $menu->$field : $menu->term_id;
 
                 // Get the id and the name
-                $contents[0][$item] = $menu->name;
+                $contents[$item] = $menu->name;
             }
         }
 
@@ -292,14 +260,13 @@ class Wordpress extends Field
      * @uses get_pages()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPPages($options = [], $value = 'ID')
+    protected function getWPPages($options = [], $field = 'ID')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.page', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([
@@ -317,11 +284,11 @@ class Wordpress extends Field
                     continue;
                 }
 
-                // Check value
-                $item = !empty($value) && isset($pag->$value) ? $pag->$value : $pag->ID;
+                // Check field
+                $item = !empty($field) && isset($pag->$field) ? $pag->$field : $pag->ID;
 
                 // Get the id and the name
-                $contents[0][$item] = $pag->post_title;
+                $contents[$item] = $pag->post_title;
             }
         }
 
@@ -335,14 +302,13 @@ class Wordpress extends Field
      * @uses wp_get_recent_posts()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPPosts($options = [], $value = 'ID')
+    protected function getWPPosts($options = [], $field = 'ID')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.post', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([
@@ -361,11 +327,12 @@ class Wordpress extends Field
                     continue;
                 }
 
-                // Check value
-                $item = !empty($value) && isset($pos->$value) ? $pos->$value : $pos->ID;
+                // Check field
+                $item = !empty($field) && isset($pos->$field) ? $pos->$field : $pos->ID;
 
                 // Get the id and the name
-                $contents[$pos->post_type][$item] = $pos->post_title;
+                //$contents[$pos->post_type][$item] = $pos->post_title;
+                $contents[$item] = $pos->post_title;
             }
         }
 
@@ -379,14 +346,13 @@ class Wordpress extends Field
      * @uses get_post_types()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPPosttypes($options = [], $value = 'name')
+    protected function getWPPosttypes($options = [], $field = 'name')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.posttype', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([], $options);
@@ -397,11 +363,11 @@ class Wordpress extends Field
         // Iterate on posttypes
         if (!empty($types_obj)) {
             foreach ($types_obj as $typ) {
-                // Check value
-                $item = !empty($value) && isset($typ->$value) ? $typ->$value : $typ->name;
+                // Check field
+                $item = !empty($field) && isset($typ->$field) ? $typ->$field : $typ->name;
 
                 // Get the the name
-                $contents[0][$item] = $typ->labels->name.' ('.$typ->name.')';
+                $contents[$item] = $typ->labels->name.' ('.$typ->name.')';
             }
         }
 
@@ -415,14 +381,13 @@ class Wordpress extends Field
      * @uses get_the_tags()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPTags($options = [], $value = 'term_id')
+    protected function getWPTags($options = [], $field = 'term_id')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.tag', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([], $options);
@@ -433,11 +398,11 @@ class Wordpress extends Field
         // Iterate on tags
         if (!empty($tags_obj)) {
             foreach ($tags_obj as $tag) {
-                // Check value
-                $item = !empty($value) && isset($tag->$value) ? $tag->$value : $tag->term_id;
+                // Check field
+                $item = !empty($field) && isset($tag->$field) ? $tag->$field : $tag->term_id;
 
                 // Get the id and the name
-                $contents[0][$item] = $tag->name;
+                $contents[$item] = $tag->name;
             }
         }
 
@@ -452,14 +417,13 @@ class Wordpress extends Field
      * @uses get_taxonomy()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPTaxonomies($options = [], $value = '')
+    protected function getWPTaxonomies($options = [], $field = '')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.taxonomy', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([
@@ -475,8 +439,11 @@ class Wordpress extends Field
                 // Get taxonomy details
                 $taxo = get_taxonomy($tax);
 
+                // Check field
+                $item = !empty($field) && isset($taxo->$field) ? $taxo->$field : $tax;
+
                 // Get the id and the name
-                $contents[0][$tax] = $taxo->labels->name.' ('.$taxo->name.')';
+                $contents[$item] = $taxo->labels->name.' ('.$taxo->name.')';
             }
         }
 
@@ -490,14 +457,13 @@ class Wordpress extends Field
      * @uses get_terms()
      *
      * @param   array  $options     Define options if needed
-     * @param   string $value       Define the value of each select options
+     * @param   string $field       Define the value of each select options
      * @return  array  $wpcontents  Array of WordPress items
      */
-    protected function getWPTerms($options = [], $value = 'term_id')
+    protected function getWPTerms($options = [], $field = 'term_id')
     {
         // Build contents
         $contents = [];
-        $contents[-1] = Translate::t('wordpress.choose.term', [], 'wordpressfield');
 
         // Build options
         $args = array_merge([
@@ -510,11 +476,11 @@ class Wordpress extends Field
         // Iterate on tags
         if (!empty($terms_obj) && ! is_wp_error($terms_obj)) {
             foreach ($terms_obj as $term) {
-                // Check value
-                $item = !empty($value) && isset($term->$value) ? $term->$value : $term->term_id;
+                // Check field
+                $item = !empty($field) && isset($term->$field) ? $term->$field : $term->term_id;
 
                 // Get the id and the name
-                $contents[0][$item] = $term->name;
+                $contents[$item] = $term->name;
             }
         }
 

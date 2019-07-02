@@ -1,0 +1,12 @@
+{
+  "wordpress.title": "Contenus WordPress",
+
+  "wordpress.all": "Tous",
+  "wordpress.items": "Éléments",
+  "wordpress.most_used": "Populaires",
+  "wordpress.search": "Recherche",
+  "wordpress.description": "Appuyez la touche <kbd>CTRL</kbd> ou <kbd>CMD</kbd> pour choisir plusieurs options.",
+
+  "wordpress.no_item_found": "Aucun %s trouvé.",
+  "wordpress.no_items_found": "Aucun %s trouvé."
+}
