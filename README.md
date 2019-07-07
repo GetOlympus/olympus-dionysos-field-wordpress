@@ -15,7 +15,7 @@ composer install getolympus/olympus-wordpress-field
 
 ## Field initialization
 
-Use the following lines to add a `select field` in your **WordPress** admin pages or custom post type meta fields:
+Use the following lines to add a `wordpress field` in your **WordPress** admin pages or custom post type meta fields:
 
 ```php
 return \GetOlympus\Field\Wordpress::build('my_wordpress_field_id', [
