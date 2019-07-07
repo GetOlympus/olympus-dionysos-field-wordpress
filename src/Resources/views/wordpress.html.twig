@@ -15,16 +15,17 @@
 
         <div id="{{ identifier }}-recent" class="tabs-panel">
             {% if contents and contents|length >= 1 %}
-                {% set squares = multiple ? '[]' : '' %}
+                {% set square = multiple ? '[]' : '' %}
                 {% set type = multiple ? 'checkbox' : 'radio' %}
 
                 <ul id="{{ identifier }}checklist-most-recent" data-wp-lists="list:{{ identifier }}" class="categorychecklist">
 
-                    {% for k, val in contents %}
-                        {% set selected = k in value ? true : false %}
+                    {% for k, option in contents %}
+                        {% set selected = k in value ? ' checked="checked"' : '' %}
+
                         <li id="{{ identifier }}-{{ k }}" class="popular-category">
                             <label class="selectit">
-                                <input type="{{ type }}" name="{{ name }}{{ squares }}" id="in-{{ identifier }}-{{ k }}" value="{{ k }}"{{ selected ? ' checked="checked"' : '' }} /> {{ val }}
+                                <input type="{{ type }}" name="{{ name ~ square }}" id="in-{{ identifier }}-{{ k }}" value="{{ k }}"{{ selected }} /> {{ option|raw }}
                             </label>
                         </li>
                     {% endfor %}

@@ -91,6 +91,9 @@ if (!empty($wordpress)) {
 
 ## Release History
 
+* 0.0.13
+- [x] FIX: enhance display with an easier twig template
+
 * 0.0.12
 - [x] ADD: possibility to set a specific ID on `get_the_tags` function
 
