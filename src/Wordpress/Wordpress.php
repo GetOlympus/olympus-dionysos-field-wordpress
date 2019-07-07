@@ -13,8 +13,6 @@ use GetOlympus\Zeus\Translate\Controller\Translate;
  * @author Achraf Chouk <achrafchouk@gmail.com>
  * @since 0.0.1
  *
- * @see https://olympus.readme.io/v1.0/docs/wordpress-field
- *
  */
 
 class Wordpress extends Field
@@ -51,8 +49,6 @@ class Wordpress extends Field
             'settings' => [],
 
             // Texts
-            't_all' => Translate::t('wordpress.all', $this->textdomain),
-            't_items' => Translate::t('wordpress.items', $this->textdomain),
             't_mostused' => Translate::t('wordpress.most_used', $this->textdomain),
             't_search' => Translate::t('wordpress.search', $this->textdomain),
         ];
@@ -167,6 +163,7 @@ class Wordpress extends Field
      * Get WordPress Categories registered.
      *
      * @uses get_categories()
+     * @see https://developer.wordpress.org/reference/functions/get_categories/
      *
      * @param   array   $options    Define options if needed
      * @param   string  $field      Define the value of each select options
@@ -215,6 +212,7 @@ class Wordpress extends Field
      * Get WordPress Menus registered.
      *
      * @uses wp_get_nav_menus()
+     * @see https://developer.wordpress.org/reference/functions/wp_get_nav_menus/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
@@ -258,6 +256,7 @@ class Wordpress extends Field
      * Get WordPress Pages registered.
      *
      * @uses get_pages()
+     * @see https://developer.wordpress.org/reference/functions/get_pages/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
@@ -300,6 +299,7 @@ class Wordpress extends Field
      * Get WordPress Posts registered.
      *
      * @uses wp_get_recent_posts()
+     * @see https://developer.wordpress.org/reference/functions/wp_get_recent_posts/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
@@ -331,7 +331,6 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($pos->$field) ? $pos->$field : $pos->ID;
 
                 // Get the id and the name
-                //$contents[$pos->post_type][$item] = $pos->post_title;
                 $contents[$item] = $pos->post_title;
             }
         }
@@ -344,6 +343,7 @@ class Wordpress extends Field
      * Get WordPress Post Types registered.
      *
      * @uses get_post_types()
+     * @see https://developer.wordpress.org/reference/functions/get_post_types/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
@@ -379,6 +379,7 @@ class Wordpress extends Field
      * Get WordPress Tags registered.
      *
      * @uses get_the_tags()
+     * @see https://developer.wordpress.org/reference/functions/get_the_tags/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
@@ -391,9 +392,10 @@ class Wordpress extends Field
 
         // Build options
         $args = array_merge([], $options);
+        $id = isset($args['ID']) ? $args['ID'] : 0;
 
         // Build request
-        $tags_obj = get_the_tags();
+        $tags_obj = get_the_tags($id);
 
         // Iterate on tags
         if (!empty($tags_obj)) {
@@ -415,6 +417,7 @@ class Wordpress extends Field
      *
      * @uses get_taxonomies()
      * @uses get_taxonomy()
+     * @see https://developer.wordpress.org/reference/functions/get_taxonomies/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
@@ -455,6 +458,7 @@ class Wordpress extends Field
      * Get WordPress Terms registered.
      *
      * @uses get_terms()
+     * @see https://developer.wordpress.org/reference/functions/get_terms/
      *
      * @param   array  $options     Define options if needed
      * @param   string $field       Define the value of each select options
