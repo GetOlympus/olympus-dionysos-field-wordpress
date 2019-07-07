@@ -48,6 +48,10 @@ return \GetOlympus\Field\Wordpress::build('my_wordpress_field_id', [
 | `type`        | String  | `post` | see [Accepted type](#accepted-type) |
 | `settings`    | Array   | *empty* | depends on `type` value |
 
+Notes:
+* Set `multiple` to `true` to display checkboxes instead of radio buttons
+* `field` variable is used to let you retrieve the data you need, depending on `type` value (for example: in the `'type' => 'term'` case, you'll get `term_id` by default)
+
 ## Texts definition
 
 | Code | Default value | Definition |
