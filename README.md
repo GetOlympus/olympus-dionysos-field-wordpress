@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://img.icons8.com/color/2x/wordpress.png">
+</p>
+
 # Wordpress Field
 > This component is a part of the [**Olympus Zeus Core**][zeus-url] **WordPress** framework.
 
@@ -10,7 +14,7 @@
 Using `composer` in your PHP project:
 
 ```sh
-composer install getolympus/olympus-wordpress-field
+composer require getolympus/olympus-wordpress-field
 ```
 
 ## Field initialization
@@ -19,20 +23,20 @@ Use the following lines to add a `wordpress field` in your **WordPress** admin p
 
 ```php
 return \GetOlympus\Field\Wordpress::build('my_wordpress_field_id', [
-    'title' => 'Which is your favourite post?',
-    'default' => [],
+    'title'       => 'Which is your favourite post?',
+    'default'     => [],
     'description' => 'Tell us which one did like this week.',
-    'field' => 'ID',
-    'multiple' => false,
-    'type' => 'post',
-    'settings' => [],
+    'field'       => 'ID',
+    'multiple'    => false,
+    'type'        => 'post',
+    'settings'    => [],
 
     /**
      * Texts definition
      * @see the `Texts definition` section below
      */
     't_mostused' => 'Most used',
-    't_search' => 'Search',
+    't_search'   => 'Search',
 ]);
 ```
 
@@ -91,14 +95,14 @@ if (!empty($wordpress)) {
 
 ## Release History
 
+* 0.0.15
+- [x] FIX: remove twig dependency from composer
+
+* 0.0.14
+- [x] FIX: remove zeus-core dependency from composer
+
 * 0.0.13
 - [x] FIX: enhance display with an easier twig template
-
-* 0.0.12
-- [x] ADD: possibility to set a specific ID on `get_the_tags` function
-
-* 0.0.11
-- [x] ADD: new version compatible with Zeus-Core latest version
 
 ## Authors and Copyright
 
@@ -108,8 +112,8 @@ Achraf Chouk
 Please, read [LICENSE][license-blob] for more information.  
 [![MIT][license-image]][license-url]
 
-[https://github.com/crewstyle](https://github.com/crewstyle)  
-[http://fr.linkedin.com/in/achrafchouk](http://fr.linkedin.com/in/achrafchouk)
+<https://github.com/crewstyle>  
+<https://fr.linkedin.com/in/achrafchouk>
 
 ## Contributing
 
