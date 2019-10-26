@@ -95,6 +95,9 @@ if (!empty($wordpress)) {
 
 ## Release History
 
+* 0.0.16
+- [x] FIX: bug on vars description
+
 * 0.0.15
 - [x] FIX: remove twig dependency from composer
 

@@ -105,7 +105,7 @@ class Wordpress extends Field
         // Field description
         if (empty($vars['contents'])) {
             $translate = $vars['multiple'] ? 'wordpress.no_items_found' : 'wordpress.no_item_found';
-            $vars['description'] = sprintf(Translate::t($translate, $this->textdomain), $vars['mode']).'<br/>'.$vars['description'];
+            $vars['description'] = sprintf(Translate::t($translate, $this->textdomain), $vars['type']).'<br/>'.$vars['description'];
         }
 
         // Update vars
