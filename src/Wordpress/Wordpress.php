@@ -2,13 +2,13 @@
 
 namespace GetOlympus\Field;
 
-use GetOlympus\Zeus\Field\Controller\Field;
-use GetOlympus\Zeus\Translate\Controller\Translate;
+use GetOlympus\Zeus\Field\Field;
+use GetOlympus\Zeus\Utils\Translate;
 
 /**
  * Builds Wordpress field.
  *
- * @package Field
+ * @package DionysosField
  * @subpackage Wordpress
  * @author Achraf Chouk <achrafchouk@gmail.com>
  * @since 0.0.1
@@ -37,13 +37,14 @@ class Wordpress extends Field
      *
      * @return array
      */
-    protected function getDefaults()
+    protected function getDefaults() : array
     {
         return [
             'title' => Translate::t('wordpress.title', $this->textdomain),
             'default' => [],
             'description' => '',
             'field' => 'ID',
+            'mode' => '',
             'multiple' => false,
             'type' => 'post',
             'settings' => [],
@@ -62,7 +63,7 @@ class Wordpress extends Field
      *
      * @return array
      */
-    protected function getVars($value, $contents)
+    protected function getVars($value, $contents) : array
     {
         // Available types
         $types = [
@@ -84,11 +85,18 @@ class Wordpress extends Field
             'term' => 'term'
         ];
 
+        // Available mode display
+        $modes = ['default', 'extended'];
+
         // Get contents
         $vars = $contents;
 
         // Retrieve field value
         $vars['value'] = !is_array($value) ? [$value] : $value;
+
+        // Mode
+        $vars['mode'] = isset($vars['mode']) ? $vars['mode'] : '';
+        $vars['mode'] = in_array($vars['mode'], $modes) ? $vars['mode'] : 'default';
 
         // Check types
         $vars['type'] = array_key_exists($vars['type'], $types) ? $types[$vars['type']] : 'post';
@@ -115,14 +123,15 @@ class Wordpress extends Field
     /**
      * Get Wordpress contents already registered.
      *
-     * @param   string  $type       Wordpress content type to return
-     * @param   boolean $multiple   Define if there is multiselect or not
-     * @param   array   $settings   Define settings if needed
-     * @param   integer $post_id    Define the post ID for meta boxes
-     * @param   string  $field      Define the value of each select options
-     * @return  array   $wpcontents Array of Wordpress content type registered
+     * @param  string  $type
+     * @param  bool    $multiple
+     * @param  array   $settings
+     * @param  int     $post_id
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPContents($type = 'post', $multiple = false, $settings = [], $post_id = 0, $field = '')
+    protected function getWPContents($type, $multiple = false, $settings = [], $post_id = 0, $field = '') : array
     {
         // Access WordPress contents
         $wpcontents = [];
@@ -165,14 +174,15 @@ class Wordpress extends Field
      * @uses get_categories()
      * @see https://developer.wordpress.org/reference/functions/get_categories/
      *
-     * @param   array   $options    Define options if needed
-     * @param   string  $field      Define the value of each select options
-     * @param   array   $contents   Define all already set contents
-     * @param   integer $parent     Define parent category
-     * @param   string  $prefix     Define text to display before name
-     * @return  array   $wpcontents Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     * @param  array   $contents
+     * @param  int     $parent
+     * @param  string  $prefix
+     *
+     * @return array
      */
-    protected function getWPCategories($options = [], $field = 'cat_ID', $contents = [], $parent = 0, $prefix = '')
+    protected function getWPCategories($options, $field = 'cat_ID', $contents = [], $parent = 0, $prefix = '') : array
     {
         // Build options
         $args = array_merge([
@@ -214,11 +224,12 @@ class Wordpress extends Field
      * @uses wp_get_nav_menus()
      * @see https://developer.wordpress.org/reference/functions/wp_get_nav_menus/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array   $wpcontents
      */
-    protected function getWPMenus($options = [], $field = 'term_id')
+    protected function getWPMenus($options, $field = 'term_id') : array
     {
         // Build contents
         $contents = [];
@@ -258,11 +269,12 @@ class Wordpress extends Field
      * @uses get_pages()
      * @see https://developer.wordpress.org/reference/functions/get_pages/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPPages($options = [], $field = 'ID')
+    protected function getWPPages($options, $field = 'ID') : array
     {
         // Build contents
         $contents = [];
@@ -301,11 +313,12 @@ class Wordpress extends Field
      * @uses wp_get_recent_posts()
      * @see https://developer.wordpress.org/reference/functions/wp_get_recent_posts/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPPosts($options = [], $field = 'ID')
+    protected function getWPPosts($options, $field = 'ID') : array
     {
         // Build contents
         $contents = [];
@@ -345,11 +358,12 @@ class Wordpress extends Field
      * @uses get_post_types()
      * @see https://developer.wordpress.org/reference/functions/get_post_types/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPPosttypes($options = [], $field = 'name')
+    protected function getWPPosttypes($options, $field = 'name') : array
     {
         // Build contents
         $contents = [];
@@ -381,11 +395,12 @@ class Wordpress extends Field
      * @uses get_the_tags()
      * @see https://developer.wordpress.org/reference/functions/get_the_tags/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPTags($options = [], $field = 'term_id')
+    protected function getWPTags($options, $field = 'term_id') : array
     {
         // Build contents
         $contents = [];
@@ -419,11 +434,12 @@ class Wordpress extends Field
      * @uses get_taxonomy()
      * @see https://developer.wordpress.org/reference/functions/get_taxonomies/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPTaxonomies($options = [], $field = '')
+    protected function getWPTaxonomies($options, $field = '') : array
     {
         // Build contents
         $contents = [];
@@ -460,11 +476,12 @@ class Wordpress extends Field
      * @uses get_terms()
      * @see https://developer.wordpress.org/reference/functions/get_terms/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPTerms($options = [], $field = 'term_id')
+    protected function getWPTerms($options, $field = 'term_id') : array
     {
         // Build contents
         $contents = [];
