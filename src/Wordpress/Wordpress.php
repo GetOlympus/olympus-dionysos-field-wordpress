@@ -1,17 +1,16 @@
 <?php
 
-namespace GetOlympus\Field;
+namespace GetOlympus\Dionysos\Field;
 
 use GetOlympus\Zeus\Field\Field;
-use GetOlympus\Zeus\Utils\Translate;
 
 /**
  * Builds Wordpress field.
  *
- * @package DionysosField
+ * @package    DionysosField
  * @subpackage Wordpress
- * @author Achraf Chouk <achrafchouk@gmail.com>
- * @since 0.0.1
+ * @author     Achraf Chouk <achrafchouk@gmail.com>
+ * @since      0.0.1
  *
  */
 
@@ -40,7 +39,7 @@ class Wordpress extends Field
     protected function getDefaults() : array
     {
         return [
-            'title' => Translate::t('wordpress.title', $this->textdomain),
+            'title' => parent::t('wordpress.title', $this->textdomain),
             'default' => [],
             'description' => '',
             'field' => 'ID',
@@ -50,8 +49,8 @@ class Wordpress extends Field
             'settings' => [],
 
             // Texts
-            't_mostused' => Translate::t('wordpress.most_used', $this->textdomain),
-            't_search' => Translate::t('wordpress.search', $this->textdomain),
+            't_mostused' => parent::t('wordpress.most_used', $this->textdomain),
+            't_search' => parent::t('wordpress.search', $this->textdomain),
         ];
     }
 
@@ -82,7 +81,9 @@ class Wordpress extends Field
             'taxonomies' => 'taxonomy',
             'taxonomy' => 'taxonomy',
             'terms' => 'term',
-            'term' => 'term'
+            'term' => 'term',
+            'users' => 'user',
+            'user' => 'user'
         ];
 
         // Available mode display
@@ -113,7 +114,7 @@ class Wordpress extends Field
         // Field description
         if (empty($vars['contents'])) {
             $translate = $vars['multiple'] ? 'wordpress.no_items_found' : 'wordpress.no_item_found';
-            $vars['description'] = sprintf(Translate::t($translate, $this->textdomain), $vars['type']).'<br/>'.$vars['description'];
+            $vars['description'] = sprintf(parent::t($translate, $this->textdomain), $vars['type']).'<br/>'.$vars['description'];
         }
 
         // Update vars
@@ -141,6 +142,8 @@ class Wordpress extends Field
             $settings['exclude'] = $post;
         }
 
+        $wptype = 'Posts';
+
         // Data retrieved
         if ('category' === $type) {
             $wptype = 'Categories';
@@ -148,16 +151,16 @@ class Wordpress extends Field
             $wptype = 'Menus';
         } else if ('page' === $type) {
             $wptype = 'Pages';
-        } else if ('post' === $type) {
-            $wptype = 'Posts';
         } else if ('posttype' === $type) {
             $wptype = 'Posttypes';
         } else if ('tag' === $type) {
             $wptype = 'Tags';
         } else if ('taxonomy' === $type) {
             $wptype = 'Taxonomies';
-        } else {
+        } else if ('term' === $type) {
             $wptype = 'Terms';
+        } else if ('user' === $type) {
+            $wptype = 'Users';
         }
 
         // Get contents
@@ -495,13 +498,53 @@ class Wordpress extends Field
         $terms_obj = get_terms($args);
 
         // Iterate on tags
-        if (!empty($terms_obj) && ! is_wp_error($terms_obj)) {
+        if (!empty($terms_obj) && !is_wp_error($terms_obj)) {
             foreach ($terms_obj as $term) {
                 // Check field
                 $item = !empty($field) && isset($term->$field) ? $term->$field : $term->term_id;
 
                 // Get the id and the name
                 $contents[$item] = $term->name;
+            }
+        }
+
+        // Return all values in a well formatted way
+        return $contents;
+    }
+
+    /**
+     * Get WordPress Users registered.
+     *
+     * @uses get_users()
+     * @see https://developer.wordpress.org/reference/functions/get_users/
+     * @see https://codex.wordpress.org/Function_Reference/get_users
+     *
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
+     */
+    protected function getWPUsers($options, $field = 'ID') : array
+    {
+        // Build contents
+        $contents = [];
+
+        // Build options
+        $args = array_merge([
+            'role' => '',
+        ], $options);
+
+        // Build request
+        $users_obj = get_users($args);
+
+        // Iterate on tags
+        if (!empty($users_obj) && !is_wp_error($users_obj)) {
+            foreach ($users_obj as $user) {
+                // Check field
+                $item = !empty($field) && isset($user->$field) ? $user->$field : $user->ID;
+
+                // Get the id and the name
+                $contents[$item] = $user->display_name;
             }
         }
 
