@@ -1,17 +1,16 @@
 <?php
 
-namespace GetOlympus\Field;
+namespace GetOlympus\Dionysos\Field;
 
-use GetOlympus\Zeus\Field\Controller\Field;
-use GetOlympus\Zeus\Translate\Controller\Translate;
+use GetOlympus\Zeus\Field\Field;
 
 /**
  * Builds Wordpress field.
  *
- * @package Field
+ * @package    DionysosField
  * @subpackage Wordpress
- * @author Achraf Chouk <achrafchouk@gmail.com>
- * @since 0.0.1
+ * @author     Achraf Chouk <achrafchouk@gmail.com>
+ * @since      0.0.1
  *
  */
 
@@ -37,20 +36,21 @@ class Wordpress extends Field
      *
      * @return array
      */
-    protected function getDefaults()
+    protected function getDefaults() : array
     {
         return [
-            'title' => Translate::t('wordpress.title', $this->textdomain),
+            'title' => parent::t('wordpress.title', $this->textdomain),
             'default' => [],
             'description' => '',
             'field' => 'ID',
+            'mode' => '',
             'multiple' => false,
             'type' => 'post',
             'settings' => [],
 
             // Texts
-            't_mostused' => Translate::t('wordpress.most_used', $this->textdomain),
-            't_search' => Translate::t('wordpress.search', $this->textdomain),
+            't_mostused' => parent::t('wordpress.most_used', $this->textdomain),
+            't_search' => parent::t('wordpress.search', $this->textdomain),
         ];
     }
 
@@ -62,7 +62,7 @@ class Wordpress extends Field
      *
      * @return array
      */
-    protected function getVars($value, $contents)
+    protected function getVars($value, $contents) : array
     {
         // Available types
         $types = [
@@ -81,14 +81,23 @@ class Wordpress extends Field
             'taxonomies' => 'taxonomy',
             'taxonomy' => 'taxonomy',
             'terms' => 'term',
-            'term' => 'term'
+            'term' => 'term',
+            'users' => 'user',
+            'user' => 'user'
         ];
+
+        // Available mode display
+        $modes = ['default', 'extended'];
 
         // Get contents
         $vars = $contents;
 
         // Retrieve field value
         $vars['value'] = !is_array($value) ? [$value] : $value;
+
+        // Mode
+        $vars['mode'] = isset($vars['mode']) ? $vars['mode'] : '';
+        $vars['mode'] = in_array($vars['mode'], $modes) ? $vars['mode'] : 'default';
 
         // Check types
         $vars['type'] = array_key_exists($vars['type'], $types) ? $types[$vars['type']] : 'post';
@@ -105,7 +114,7 @@ class Wordpress extends Field
         // Field description
         if (empty($vars['contents'])) {
             $translate = $vars['multiple'] ? 'wordpress.no_items_found' : 'wordpress.no_item_found';
-            $vars['description'] = sprintf(Translate::t($translate, $this->textdomain), $vars['type']).'<br/>'.$vars['description'];
+            $vars['description'] = sprintf(parent::t($translate, $this->textdomain), $vars['type']).'<br/>'.$vars['description'];
         }
 
         // Update vars
@@ -115,14 +124,15 @@ class Wordpress extends Field
     /**
      * Get Wordpress contents already registered.
      *
-     * @param   string  $type       Wordpress content type to return
-     * @param   boolean $multiple   Define if there is multiselect or not
-     * @param   array   $settings   Define settings if needed
-     * @param   integer $post_id    Define the post ID for meta boxes
-     * @param   string  $field      Define the value of each select options
-     * @return  array   $wpcontents Array of Wordpress content type registered
+     * @param  string  $type
+     * @param  bool    $multiple
+     * @param  array   $settings
+     * @param  int     $post_id
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPContents($type = 'post', $multiple = false, $settings = [], $post_id = 0, $field = '')
+    protected function getWPContents($type, $multiple = false, $settings = [], $post_id = 0, $field = '') : array
     {
         // Access WordPress contents
         $wpcontents = [];
@@ -132,6 +142,8 @@ class Wordpress extends Field
             $settings['exclude'] = $post;
         }
 
+        $wptype = 'Posts';
+
         // Data retrieved
         if ('category' === $type) {
             $wptype = 'Categories';
@@ -139,16 +151,16 @@ class Wordpress extends Field
             $wptype = 'Menus';
         } else if ('page' === $type) {
             $wptype = 'Pages';
-        } else if ('post' === $type) {
-            $wptype = 'Posts';
         } else if ('posttype' === $type) {
             $wptype = 'Posttypes';
         } else if ('tag' === $type) {
             $wptype = 'Tags';
         } else if ('taxonomy' === $type) {
             $wptype = 'Taxonomies';
-        } else {
+        } else if ('term' === $type) {
             $wptype = 'Terms';
+        } else if ('user' === $type) {
+            $wptype = 'Users';
         }
 
         // Get contents
@@ -165,14 +177,15 @@ class Wordpress extends Field
      * @uses get_categories()
      * @see https://developer.wordpress.org/reference/functions/get_categories/
      *
-     * @param   array   $options    Define options if needed
-     * @param   string  $field      Define the value of each select options
-     * @param   array   $contents   Define all already set contents
-     * @param   integer $parent     Define parent category
-     * @param   string  $prefix     Define text to display before name
-     * @return  array   $wpcontents Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     * @param  array   $contents
+     * @param  int     $parent
+     * @param  string  $prefix
+     *
+     * @return array
      */
-    protected function getWPCategories($options = [], $field = 'cat_ID', $contents = [], $parent = 0, $prefix = '')
+    protected function getWPCategories($options, $field = 'cat_ID', $contents = [], $parent = 0, $prefix = '') : array
     {
         // Build options
         $args = array_merge([
@@ -214,11 +227,12 @@ class Wordpress extends Field
      * @uses wp_get_nav_menus()
      * @see https://developer.wordpress.org/reference/functions/wp_get_nav_menus/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array   $wpcontents
      */
-    protected function getWPMenus($options = [], $field = 'term_id')
+    protected function getWPMenus($options, $field = 'term_id') : array
     {
         // Build contents
         $contents = [];
@@ -258,11 +272,12 @@ class Wordpress extends Field
      * @uses get_pages()
      * @see https://developer.wordpress.org/reference/functions/get_pages/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPPages($options = [], $field = 'ID')
+    protected function getWPPages($options, $field = 'ID') : array
     {
         // Build contents
         $contents = [];
@@ -301,11 +316,12 @@ class Wordpress extends Field
      * @uses wp_get_recent_posts()
      * @see https://developer.wordpress.org/reference/functions/wp_get_recent_posts/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPPosts($options = [], $field = 'ID')
+    protected function getWPPosts($options, $field = 'ID') : array
     {
         // Build contents
         $contents = [];
@@ -345,11 +361,12 @@ class Wordpress extends Field
      * @uses get_post_types()
      * @see https://developer.wordpress.org/reference/functions/get_post_types/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPPosttypes($options = [], $field = 'name')
+    protected function getWPPosttypes($options, $field = 'name') : array
     {
         // Build contents
         $contents = [];
@@ -381,11 +398,12 @@ class Wordpress extends Field
      * @uses get_the_tags()
      * @see https://developer.wordpress.org/reference/functions/get_the_tags/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPTags($options = [], $field = 'term_id')
+    protected function getWPTags($options, $field = 'term_id') : array
     {
         // Build contents
         $contents = [];
@@ -419,11 +437,12 @@ class Wordpress extends Field
      * @uses get_taxonomy()
      * @see https://developer.wordpress.org/reference/functions/get_taxonomies/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPTaxonomies($options = [], $field = '')
+    protected function getWPTaxonomies($options, $field = '') : array
     {
         // Build contents
         $contents = [];
@@ -460,11 +479,12 @@ class Wordpress extends Field
      * @uses get_terms()
      * @see https://developer.wordpress.org/reference/functions/get_terms/
      *
-     * @param   array  $options     Define options if needed
-     * @param   string $field       Define the value of each select options
-     * @return  array  $wpcontents  Array of WordPress items
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
      */
-    protected function getWPTerms($options = [], $field = 'term_id')
+    protected function getWPTerms($options, $field = 'term_id') : array
     {
         // Build contents
         $contents = [];
@@ -478,13 +498,53 @@ class Wordpress extends Field
         $terms_obj = get_terms($args);
 
         // Iterate on tags
-        if (!empty($terms_obj) && ! is_wp_error($terms_obj)) {
+        if (!empty($terms_obj) && !is_wp_error($terms_obj)) {
             foreach ($terms_obj as $term) {
                 // Check field
                 $item = !empty($field) && isset($term->$field) ? $term->$field : $term->term_id;
 
                 // Get the id and the name
                 $contents[$item] = $term->name;
+            }
+        }
+
+        // Return all values in a well formatted way
+        return $contents;
+    }
+
+    /**
+     * Get WordPress Users registered.
+     *
+     * @uses get_users()
+     * @see https://developer.wordpress.org/reference/functions/get_users/
+     * @see https://codex.wordpress.org/Function_Reference/get_users
+     *
+     * @param  array   $options
+     * @param  string  $field
+     *
+     * @return array
+     */
+    protected function getWPUsers($options, $field = 'ID') : array
+    {
+        // Build contents
+        $contents = [];
+
+        // Build options
+        $args = array_merge([
+            'role' => '',
+        ], $options);
+
+        // Build request
+        $users_obj = get_users($args);
+
+        // Iterate on tags
+        if (!empty($users_obj) && !is_wp_error($users_obj)) {
+            foreach ($users_obj as $user) {
+                // Check field
+                $item = !empty($field) && isset($user->$field) ? $user->$field : $user->ID;
+
+                // Get the id and the name
+                $contents[$item] = $user->display_name;
             }
         }
 

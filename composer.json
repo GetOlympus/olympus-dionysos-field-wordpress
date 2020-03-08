@@ -1,9 +1,9 @@
 {
-  "name": "getolympus/olympus-wordpress-field",
+  "name": "getolympus/olympus-dionysos-field-wordpress",
   "type": "olympus-field",
-  "description": "WordPress field, this component is a part of the Olympus Zeus Core framework.",
-  "keywords": ["olympus-zeus", "wordpress", "field", "custom", "framework", "php"],
-  "homepage": "https://github.com/GetOlympus/olympus-wordpress-field",
+  "description": "WordPress field, this component is a part of the Olympus Dionysos fields.",
+  "keywords": ["olympus", "dionysos", "wordpress", "field", "custom", "framework", "php"],
+  "homepage": "https://github.com/GetOlympus/olympus-dionysos-field-wordpress",
   "license": "MIT",
   "authors": [
     {
@@ -13,7 +13,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "GetOlympus\\Field\\": "src/Wordpress/"
+      "GetOlympus\\Dionysos\\Field\\": "src/Wordpress/"
     }
   },
   "extra": {

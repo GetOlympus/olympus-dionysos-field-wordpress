@@ -1,28 +1,24 @@
-<p align="center">
-    <img src="https://img.icons8.com/color/2x/wordpress.png">
-</p>
-
-# Wordpress Field
-> This component is a part of the [**Olympus Zeus Core**][zeus-url] **WordPress** framework.
+# Dionysos Wordpress Field
+> This component is a part of the **Olympus Dionysos fields** for **WordPress**.
 
 [![Olympus Component][olympus-image]][olympus-url]
 [![CodeFactor Grade][codefactor-image]][codefactor-url]
 [![Packagist Version][packagist-image]][packagist-url]
 
-## Installation
-
-Using `composer` in your PHP project:
-
 ```sh
-composer require getolympus/olympus-wordpress-field
+composer require getolympus/olympus-dionysos-field-wordpress
 ```
+
+<p align="center">
+    <img src="https://github.com/GetOlympus/olympus-dionysos-field-wordpress/blob/master/assets/field-wordpress-64.png" />
+</p>
 
 ## Field initialization
 
 Use the following lines to add a `wordpress field` in your **WordPress** admin pages or custom post type meta fields:
 
 ```php
-return \GetOlympus\Field\Wordpress::build('my_wordpress_field_id', [
+return \GetOlympus\Dionysos\Field\Wordpress::build('my_wordpress_field_id', [
     'title'       => 'Which is your favourite post?',
     'default'     => [],
     'description' => 'Tell us which one did like this week.',
@@ -73,6 +69,7 @@ Notes:
 * `tags` or `tag` (see `get_the_tags` on [WordPress reference](https://developer.wordpress.org/reference/functions/get_the_tags/) for `field` and `settings` variables)
 * `taxonomies` or `taxonomy` (see `get_taxonomies` on [WordPress reference](https://developer.wordpress.org/reference/functions/get_taxonomies/) for `field` and `settings` variables)
 * `terms` or `term` (see `get_terms` on [WordPress reference](https://developer.wordpress.org/reference/functions/get_terms/) for `field` and `settings` variables)
+* `users` or `user` (see `get_users` on [WordPress reference](https://developer.wordpress.org/reference/functions/get_users/) for `field` and `settings` variables)
 
 ## Retrive data
 
@@ -95,17 +92,15 @@ if (!empty($wordpress)) {
 
 ## Release History
 
-* 0.0.16
-- [x] FIX: bug on vars description
+0.0.17
+- New Olympus components compatibility
+- Change repository to be a part of Dionysos fields
 
-* 0.0.15
-- [x] FIX: remove twig dependency from composer
+0.0.16
+- FIX: bug on vars description
 
-* 0.0.14
-- [x] FIX: remove zeus-core dependency from composer
-
-* 0.0.13
-- [x] FIX: enhance display with an easier twig template
+0.0.15
+- FIX: remove twig dependency from composer
 
 ## Authors and Copyright
 
@@ -120,7 +115,7 @@ Please, read [LICENSE][license-blob] for more information.
 
 ## Contributing
 
-1. Fork it (<https://github.com/GetOlympus/olympus-wordpress-field/fork>)
+1. Fork it (<https://github.com/GetOlympus/olympus-dionysos-field-wordpress/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
@@ -128,19 +123,18 @@ Please, read [LICENSE][license-blob] for more information.
 
 ---
 
-**Built with ♥ by [Achraf Chouk](http://github.com/crewstyle "Achraf Chouk") ~ (c) since a long time.**
+**Built with ♥ by [Achraf Chouk](https://github.com/crewstyle "Achraf Chouk") ~ (c) since a long time.**
 
 <!-- links & imgs dfn's -->
 [olympus-image]: https://img.shields.io/badge/for-Olympus-44cc11.svg?style=flat-square
 [olympus-url]: https://github.com/GetOlympus
-[zeus-url]: https://github.com/GetOlympus/Zeus-Core
-[codefactor-image]: https://www.codefactor.io/repository/github/GetOlympus/olympus-wordpress-field/badge?style=flat-square
-[codefactor-url]: https://www.codefactor.io/repository/github/getolympus/olympus-wordpress-field
+[codefactor-image]: https://www.codefactor.io/repository/github/GetOlympus/olympus-dionysos-field-wordpress/badge?style=flat-square
+[codefactor-url]: https://www.codefactor.io/repository/github/getolympus/olympus-dionysos-field-wordpress
 [getoption-url]: https://developer.wordpress.org/reference/functions/get_option/
-[license-blob]: https://github.com/GetOlympus/olympus-wordpress-field/blob/master/LICENSE
+[license-blob]: https://github.com/GetOlympus/olympus-dionysos-field-wordpress/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-MIT_License-blue.svg?style=flat-square
 [license-url]: http://opensource.org/licenses/MIT
-[packagist-image]: https://img.shields.io/packagist/v/getolympus/olympus-wordpress-field.svg?style=flat-square
-[packagist-url]: https://packagist.org/packages/getolympus/olympus-wordpress-field
+[packagist-image]: https://img.shields.io/packagist/v/getolympus/olympus-dionysos-field-wordpress.svg?style=flat-square
+[packagist-url]: https://packagist.org/packages/getolympus/olympus-dionysos-field-wordpress
 [twitter-image]: https://img.shields.io/badge/crewstyle-blue.svg?style=social&logo=twitter
-[twitter-url]: http://twitter.com/crewstyle
+[twitter-url]: https://twitter.com/crewstyle
