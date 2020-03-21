@@ -1,12 +1,27 @@
 {
-  "wordpress.title": "WordPress contents",
+    "wordpress.title": "WordPress contents",
 
-  "wordpress.all": "All",
-  "wordpress.items": "Items",
-  "wordpress.most_used": "Most used",
-  "wordpress.search": "Search",
-  "wordpress.description": "Press the <code>CTRL</code> or <code>CMD</code> button to select more than one option.",
+    "wordpress.addblock_title": "Click on the edit button",
+    "wordpress.addblock_description": "Click on the \"+\" button to add your link.",
+    "wordpress.addblocks_description": "Click on the \"+\" button to add a link item.",
 
-  "wordpress.no_item_found": "There is no %s found.",
-  "wordpress.no_items_found": "There are no %s found."
+    "wordpress.addblock_label": "Add",
+    "wordpress.editblock_label": "Edit",
+    "wordpress.removeblock_label": "Remove",
+
+    "wordpress.modal.title": "Choose a content",
+    "wordpress.modal.close": "Close",
+    "wordpress.modal.search": "Search",
+    "wordpress.modal.submit": "Select",
+
+    "wordpress.ajax.no_items_found": "No item found",
+    "wordpress.ajax.title": "Title",
+    "wordpress.ajax.type": "Type",
+    "wordpress.ajax.date": "Date",
+    "wordpress.ajax.status": "Status",
+    "wordpress.ajax.no_title": "No title",
+    "wordpress.ajax.published": "Published",
+    "wordpress.ajax.future": "Future",
+    "wordpress.ajax.pending": "Pending",
+    "wordpress.ajax.draft": "Draft"
 }

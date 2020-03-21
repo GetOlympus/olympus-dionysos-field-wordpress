@@ -17,9 +17,14 @@ use GetOlympus\Zeus\Field\Field;
 class Wordpress extends Field
 {
     /**
-     * @var array
+     * @var string
      */
-    //protected $adminscripts = ['wp-lists', 'zeus-tabs'];
+    protected $script = 'js'.S.'wordpress.js';
+
+    /**
+     * @var string
+     */
+    protected $style = 'css'.S.'wordpress.css';
 
     /**
      * @var string
@@ -30,6 +35,96 @@ class Wordpress extends Field
      * @var string
      */
     protected $textdomain = 'wordpressfield';
+
+    /**
+     * Ajax callback used for specific Field actions.
+     *
+     * @param  array   $request
+     *
+     * @return string
+     */
+    protected function ajaxCallback($request) : string
+    {
+        // Get contents
+        $search   = wp_unslash($request['search']);
+        $posttype = $request['type'];
+
+        // Set available post types
+        $posttypes = get_post_types(['public' => true], 'objects');
+        unset($posttypes['attachment']);
+
+        if (!array_key_exists($posttype, $posttypes)) {
+            return '-1';
+        }
+
+        // Build args
+        $args = [
+            'post_type'      => $posttype,
+            'post_status'    => 'any',
+            'posts_per_page' => 50,
+        ];
+
+        if ('' !== $search) {
+            $args['s'] = $search;
+        }
+
+        // Get posts
+        $posts = get_posts($args);
+
+        if (!$posts) {
+            wp_send_json_error(parent::t('wordpress.ajax.no_items_found', $this->textdomain));
+        }
+
+        // Start building HTML ~ Header
+        $html = '<table class="widefat">';
+        $html .= '<thead><tr>';
+        $html .= '<th class="found-radio"></th>';
+        $html .= '<th>'.parent::t('wordpress.ajax.title', $this->textdomain).'</th>';
+        $html .= '<th class="no-break">'.parent::t('wordpress.ajax.type', $this->textdomain).'</th>';
+        $html .= '<th class="no-break">'.parent::t('wordpress.ajax.date', $this->textdomain).'</th>';
+        $html .= '<th class="no-break">'.parent::t('wordpress.ajax.status', $this->textdomain).'</th>';
+        $html .= '</tr></thead>';
+
+        // HTML ~ Body
+        $html .= '<tbody>';
+        $alt   = '';
+
+        foreach ($posts as $post) {
+            $alt   = 'alternate' === $alt ? '' : 'alternate';
+
+            // Works on title
+            $title = trim($post->post_title);
+            $title = $title ? $title : parent::t('wordpress.ajax.no_title', $this->textdomain);
+
+            // Works on status
+            $status = parent::t('wordpress.ajax.published', $this->textdomain);
+
+            if (in_array($post->post_status, ['future', 'pending', 'draft'])) {
+                $status = parent::t('wordpress.ajax.'.$post->post_status, $this->textdomain);
+            }
+
+            // Works on date
+            $time = '0000-00-00 00:00:00' == $post->post_date ? '' : mysql2date(__('Y/m/d'), $post->post_date);
+
+            // Build HTML ~ Content
+            $html .= '<tr class="'.trim('found-posts '.$alt).'">';
+            $html .= '<td class="found-radio">';
+            $html .= '<input type="radio" id="found-'.$post->ID.'" name="post_id" value="'.esc_attr($post->ID).'" />';
+            $html .= '</td>';
+            $html .= '<td class="title" data-l="'.get_permalink($post->ID).'">';
+            $html .= '<label for="found-'.$post->ID.'">'.esc_html($title).'</label></td>';
+            $html .= '</td>';
+            $html .= '<td class="no-break">'.esc_html($posttypes[$post->post_type]->labels->singular_name).'</td>';
+            $html .= '<td class="no-break">'.esc_html($time).'</td>';
+            $html .= '<td class="no-break">'.esc_html($status).'</td>';
+            $html .= '</tr>';
+        }
+
+        $html .= '</tbody>';
+        $html .= '</table>';
+
+        return $html;
+    }
 
     /**
      * Prepare defaults.
@@ -48,9 +143,18 @@ class Wordpress extends Field
             'type' => 'post',
             'settings' => [],
 
-            // Texts
-            't_mostused' => parent::t('wordpress.most_used', $this->textdomain),
-            't_search' => parent::t('wordpress.search', $this->textdomain),
+            // texts
+            't_addblock_title' => parent::t('wordpress.addblock_title', $this->textdomain),
+            't_addblock_description' => parent::t('wordpress.addblock_description', $this->textdomain),
+            't_addblocks_description' => parent::t('wordpress.addblocks_description', $this->textdomain),
+            't_addblock_label' => parent::t('wordpress.addblock_label', $this->textdomain),
+            't_editblock_label' => parent::t('wordpress.editblock_label', $this->textdomain),
+            't_removeblock_label' => parent::t('wordpress.removeblock_label', $this->textdomain),
+
+            't_modaltitle_label' => parent::t('wordpress.modal.title', $this->textdomain),
+            't_modalclose_label' => parent::t('wordpress.modal.close', $this->textdomain),
+            't_modalsearch_label' => parent::t('wordpress.modal.search', $this->textdomain),
+            't_modalsubmit_label' => parent::t('wordpress.modal.submit', $this->textdomain),
         ];
     }
 

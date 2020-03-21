@@ -1,0 +1,26 @@
+<div id="{{ id }}-modal" class="find-box" style="display: none;">
+    <div class="find-box-head">
+        {{ t_modaltitle_label }}
+
+        <button type="button" class="{{ id }}-close" id="find-posts-close">
+            <span class="screen-reader-text">{{ t_modalclose_label }}</span>
+        </button>
+    </div>
+
+    <div class="find-box-inside">
+        <div class="find-box-search">
+            <label class="screen-reader-text">{{ t_modalsearch_label }}</label>
+            <input type="text" name="search" value="" class="{{ id }}-input" />
+            <span class="{{ id }}-spinner spinner"></span>
+            <input type="button" value="{{ t_modalsearch_label|raw }}" class="button {{ id }}-search" />
+        </div>
+
+        <div class="{{ id }}-response"></div>
+    </div>
+
+    <div class="find-box-buttons">
+        <input type="submit" class="button button-primary alignright {{ id }}-submit" value="{{ t_modalsubmit_label|raw }}" />
+    </div>
+</div>
+
+<div class="ui-find-overlay" style="display: none;"></div>

@@ -1,0 +1,18 @@
+{% set _id = id is defined ? id : '{{ data.id }}' %}
+{% set _url = _id == '{{ data.id }}' ? '' : get_permalink(_id) %}
+{% set _label = _id == '{{ data.id }}' ? '' : get_the_title(_id) %}
+
+<fieldset class="link-to-original link-block">
+    <input type="hidden" name="{{ fieldname }}" value="{{ _id }}" />
+
+    <span class="link-label">{{ _label ?: t_addblock_label }}</span>
+    <a href="{{ _url }}" class="link-url" target="_blank">{{ _url }}</a>
+
+    <button type="button" class="zeus-btn edit-button has-icon" aria-label="{{ t_editblock_label|raw }}">
+        <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"></path></svg>
+    </button>
+
+    <button type="button" class="zeus-btn remove-button has-icon" aria-label="{{ t_removeblock_label|raw }}">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" role="img" aria-hidden="true" focusable="false"><path d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"></path></svg>
+    </button>
+</fieldset>

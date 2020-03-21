@@ -1,12 +1,27 @@
 {
-  "wordpress.title": "Contenus WordPress",
+    "wordpress.title": "Contenus WordPress",
 
-  "wordpress.all": "Tous",
-  "wordpress.items": "Éléments",
-  "wordpress.most_used": "Populaires",
-  "wordpress.search": "Recherche",
-  "wordpress.description": "Appuyez la touche <kbd>CTRL</kbd> ou <kbd>CMD</kbd> pour choisir plusieurs options.",
+    "wordpress.addblock_title": "Ajoutez un lien en cliquant sur le bouton d'édition",
+    "wordpress.addblock_description": "Cliquez sur le bouton \"+\" pour ajouter un lien.",
+    "wordpress.addblocks_description": "Cliquez sur le bouton \"+\" pour ajouter un nouveau lien.",
 
-  "wordpress.no_item_found": "Aucun %s trouvé.",
-  "wordpress.no_items_found": "Aucun %s trouvé."
+    "wordpress.addblock_label": "Ajouter",
+    "wordpress.editblock_label": "Editer",
+    "wordpress.removeblock_label": "Supprimer",
+
+    "wordpress.modal.title": "Choisissez un contenu",
+    "wordpress.modal.close": "Fermer",
+    "wordpress.modal.search": "Recherche",
+    "wordpress.modal.submit": "Sélectionner",
+
+    "wordpress.ajax.no_items_found": "Aucun item trouvé",
+    "wordpress.ajax.title": "Titre",
+    "wordpress.ajax.type": "Type",
+    "wordpress.ajax.date": "Date",
+    "wordpress.ajax.status": "Statut",
+    "wordpress.ajax.no_title": "Aucun titre",
+    "wordpress.ajax.published": "Publié",
+    "wordpress.ajax.future": "Planifié",
+    "wordpress.ajax.pending": "En attente",
+    "wordpress.ajax.draft": "Brouillon"
 }
