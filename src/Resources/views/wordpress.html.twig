@@ -4,60 +4,71 @@
 {% block label %}<label>{{ title|raw }}</label>{% endblock %}
 
 {% block field %}
-    <div id="{{ identifier }}-wp" class="olz-field wordpress {{ type }} categorydiv">
+    <div id="{{ identifier }}-wordpress" class="dionysos-field wordpress {{ type }}">
         <input type="hidden" name="{{ name }}" value="" />
 
-        <ul class="category-tabs">
-            <li class="tabs">
-                <a href="#{{ identifier }}-recent">{{ t_mostused }}</a>
-            </li>
-        </ul>
+        <div class="listbox">
+            {% if value|length > 0 %}
+                {% for v in value %}
+                    {% include '@wordpress/expand.html.twig' with {
+                        'fieldname': name,
+                        'multiple': multiple,
 
-        <div id="{{ identifier }}-recent" class="tabs-panel">
-            {% if contents and contents|length >= 1 %}
-                {% set square = multiple ? '[]' : '' %}
-                {% set type = multiple ? 'checkbox' : 'radio' %}
+                        'id': v,
 
-                <ul id="{{ identifier }}checklist-most-recent" data-wp-lists="list:{{ identifier }}" class="categorychecklist">
-
-                    {% for k, option in contents %}
-                        {% set selected = k in value ? ' checked="checked"' : '' %}
-
-                        <li id="{{ identifier }}-{{ k }}" class="popular-category">
-                            <label class="selectit">
-                                <input type="{{ type }}" name="{{ name ~ square }}" id="in-{{ identifier }}-{{ k }}" value="{{ k }}"{{ selected }} /> {{ option|raw }}
-                            </label>
-                        </li>
-                    {% endfor %}
-
-                </ul>
+                        't_addblock_label': t_addblock_title,
+                        't_editblock_label': t_editblock_label,
+                        't_removeblock_label': t_removeblock_label,
+                    } only %}
+                {% endfor %}
             {% endif %}
         </div>
 
-        {#<script>
+        <div class="hide-if-no-js submitbox">
+            {{ multiple ? t_addblocks_description : t_addblock_description }}
+
+            <button type="button" class="zeus-btn add-button has-icon" aria-label="{{ t_addblock_label|raw }}">
+                <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" role="img" aria-hidden="true" focusable="false"><path d="M10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6zM10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6z"></path></svg>
+            </button>
+        </div>
+
+        <script>
             (function($) {
                 $(document).ready(function() {
-                    $("#{{ identifier }}-wp").zeusTabs({
-                        identifier: "{{ identifier }}",
-                        lists: {
-                            search: "{{ t_search|raw }}",
-                        },
-                        type: "{{ type }}"
+                    $("#{{ identifier }}-wordpress").dionysosWordpress({
+                        multiple: {{ multiple ? 'true' : 'false' }},
+                        modal: "{{ identifier }}",
+                        source: "{{ identifier }}-item",
                     });
                 });
             })(jQuery);
-        </script>#}
+        </script>
+
+        {% include '@wordpress/modal.html.twig' with {
+            'id': identifier,
+            'fieldname': name,
+            'multiple': multiple,
+
+            't_modaltitle_label': t_modaltitle_label,
+            't_modalclose_label': t_modalclose_label,
+            't_modalsearch_label': t_modalsearch_label,
+            't_modalsubmit_label': t_modalsubmit_label,
+        } only %}
     </div>
 {% endblock %}
 
-{# block footer %}
-    <script type="text/html" id="tmpl-{{ identifier }}-search">
-        {% include '@wordpress/search.html.twig' with {
-            'id': identifier,
-            'label': t_search,
+{% block footer %}
+    <script type="text/html" id="tmpl-{{ identifier }}-item">
+        {% include '@wordpress/expand.html.twig' with {
+            'fieldname': name,
+            'multiple': multiple,
+
+            't_addblock_label': t_addblock_title,
+            't_editblock_label': t_editblock_label,
+            't_removeblock_label': t_removeblock_label,
         } only %}
     </script>
-{% endblock #}
+{% endblock %}
 
 {% block description %}
     {{ description|raw }}

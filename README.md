@@ -1,17 +1,25 @@
 # Dionysos Wordpress Field
 > This component is a part of the **Olympus Dionysos fields** for **WordPress**.
-
-[![Olympus Component][olympus-image]][olympus-url]
-[![CodeFactor Grade][codefactor-image]][codefactor-url]
-[![Packagist Version][packagist-image]][packagist-url]
+> It uses a duplicate `findPosts` WordPress custom modal to manage field.
 
 ```sh
 composer require getolympus/olympus-dionysos-field-wordpress
 ```
 
+---
+
+[![Olympus Component][olympus-image]][olympus-url]
+[![CodeFactor Grade][codefactor-image]][codefactor-url]
+[![Packagist Version][packagist-image]][packagist-url]
+[![MIT][license-image]][license-blob]
+
+---
+
 <p align="center">
     <img src="https://github.com/GetOlympus/olympus-dionysos-field-wordpress/blob/master/assets/field-wordpress-64.png" />
 </p>
+
+---
 
 ## Field initialization
 
@@ -92,26 +100,15 @@ if (!empty($wordpress)) {
 
 ## Release History
 
+0.0.18
+- Display now compatible with new Zeus-Core version
+
 0.0.17
 - New Olympus components compatibility
 - Change repository to be a part of Dionysos fields
 
 0.0.16
 - FIX: bug on vars description
-
-0.0.15
-- FIX: remove twig dependency from composer
-
-## Authors and Copyright
-
-Achraf Chouk  
-[![@crewstyle][twitter-image]][twitter-url]
-
-Please, read [LICENSE][license-blob] for more information.  
-[![MIT][license-image]][license-url]
-
-<https://github.com/crewstyle>  
-<https://fr.linkedin.com/in/achrafchouk>
 
 ## Contributing
 
@@ -133,8 +130,5 @@ Please, read [LICENSE][license-blob] for more information.
 [getoption-url]: https://developer.wordpress.org/reference/functions/get_option/
 [license-blob]: https://github.com/GetOlympus/olympus-dionysos-field-wordpress/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-MIT_License-blue.svg?style=flat-square
-[license-url]: http://opensource.org/licenses/MIT
 [packagist-image]: https://img.shields.io/packagist/v/getolympus/olympus-dionysos-field-wordpress.svg?style=flat-square
 [packagist-url]: https://packagist.org/packages/getolympus/olympus-dionysos-field-wordpress
-[twitter-image]: https://img.shields.io/badge/crewstyle-blue.svg?style=social&logo=twitter
-[twitter-url]: https://twitter.com/crewstyle
