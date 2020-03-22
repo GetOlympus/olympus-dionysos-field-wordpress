@@ -2,8 +2,8 @@
     "wordpress.title": "WordPress contents",
 
     "wordpress.addblock_title": "Click on the edit button",
-    "wordpress.addblock_description": "Click on the \"+\" button to add your link.",
-    "wordpress.addblocks_description": "Click on the \"+\" button to add a link item.",
+    "wordpress.addblock_description": "Click on the \"+\" button to add your item.",
+    "wordpress.addblocks_description": "Click on the \"+\" button to add a new item.",
 
     "wordpress.addblock_label": "Add",
     "wordpress.editblock_label": "Edit",

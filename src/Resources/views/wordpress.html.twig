@@ -36,7 +36,10 @@
             (function($) {
                 $(document).ready(function() {
                     $("#{{ identifier }}-wordpress").dionysosWordpress({
+                        error: "{{ t_ajaxerror_label }}",
                         multiple: {{ multiple ? 'true' : 'false' }},
+                        settings: {{ settings|json_encode|replace({"'": "&#39;"})|raw }},
+                        type: "{{ type }}",
                         modal: "{{ identifier }}",
                         source: "{{ identifier }}-item",
                     });

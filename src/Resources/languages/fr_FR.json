@@ -1,9 +1,9 @@
 {
     "wordpress.title": "Contenus WordPress",
 
-    "wordpress.addblock_title": "Ajoutez un lien en cliquant sur le bouton d'édition",
-    "wordpress.addblock_description": "Cliquez sur le bouton \"+\" pour ajouter un lien.",
-    "wordpress.addblocks_description": "Cliquez sur le bouton \"+\" pour ajouter un nouveau lien.",
+    "wordpress.addblock_title": "Ajoutez un item en cliquant sur le bouton d'édition",
+    "wordpress.addblock_description": "Cliquez sur le bouton \"+\" pour ajouter un item.",
+    "wordpress.addblocks_description": "Cliquez sur le bouton \"+\" pour ajouter un nouvel item.",
 
     "wordpress.addblock_label": "Ajouter",
     "wordpress.editblock_label": "Editer",

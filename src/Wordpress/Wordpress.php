@@ -17,6 +17,30 @@ use GetOlympus\Zeus\Field\Field;
 class Wordpress extends Field
 {
     /**
+     * @var array
+     */
+    protected $posttypes = [
+        'categories' => 'category',
+        'category' => 'category',
+        'menus' => 'menu',
+        'menu' => 'menu',
+        'pages' => 'page',
+        'page' => 'page',
+        'posts' => 'post',
+        'post' => 'post',
+        'posttypes' => 'posttype',
+        'posttype' => 'posttype',
+        'tags' => 'tag',
+        'tag' => 'tag',
+        'taxonomies' => 'taxonomy',
+        'taxonomy' => 'taxonomy',
+        'terms' => 'term',
+        'term' => 'term',
+        'users' => 'user',
+        'user' => 'user'
+    ];
+
+    /**
      * @var string
      */
     protected $script = 'js'.S.'wordpress.js';
@@ -47,31 +71,20 @@ class Wordpress extends Field
     {
         // Get contents
         $search   = wp_unslash($request['search']);
-        $posttype = $request['type'];
+        $field    = $request['field'];
+        $settings = $request['settings'];
+        $type     = $request['type'];
 
-        // Set available post types
-        $posttypes = get_post_types(['public' => true], 'objects');
-        unset($posttypes['attachment']);
-
-        if (!array_key_exists($posttype, $posttypes)) {
+        // Check types
+        if (!array_key_exists($type, $this->posttypes)) {
             return '-1';
         }
 
-        // Build args
-        $args = [
-            'post_type'      => $posttype,
-            'post_status'    => 'any',
-            'posts_per_page' => 50,
-        ];
+        // Get wanted objects
+        $objects = $this->getWPContents($type, $settings, $field, $search);
 
-        if ('' !== $search) {
-            $args['s'] = $search;
-        }
-
-        // Get posts
-        $posts = get_posts($args);
-
-        if (!$posts) {
+        // Check objects
+        if (!$objects) {
             wp_send_json_error(parent::t('wordpress.ajax.no_items_found', $this->textdomain));
         }
 
@@ -80,43 +93,28 @@ class Wordpress extends Field
         $html .= '<thead><tr>';
         $html .= '<th class="found-radio"></th>';
         $html .= '<th>'.parent::t('wordpress.ajax.title', $this->textdomain).'</th>';
-        $html .= '<th class="no-break">'.parent::t('wordpress.ajax.type', $this->textdomain).'</th>';
-        $html .= '<th class="no-break">'.parent::t('wordpress.ajax.date', $this->textdomain).'</th>';
-        $html .= '<th class="no-break">'.parent::t('wordpress.ajax.status', $this->textdomain).'</th>';
         $html .= '</tr></thead>';
 
         // HTML ~ Body
         $html .= '<tbody>';
         $alt   = '';
 
-        foreach ($posts as $post) {
+        foreach ($objects as $key => $obj) {
             $alt   = 'alternate' === $alt ? '' : 'alternate';
 
-            // Works on title
-            $title = trim($post->post_title);
-            $title = $title ? $title : parent::t('wordpress.ajax.no_title', $this->textdomain);
-
-            // Works on status
-            $status = parent::t('wordpress.ajax.published', $this->textdomain);
-
-            if (in_array($post->post_status, ['future', 'pending', 'draft'])) {
-                $status = parent::t('wordpress.ajax.'.$post->post_status, $this->textdomain);
-            }
-
-            // Works on date
-            $time = '0000-00-00 00:00:00' == $post->post_date ? '' : mysql2date(__('Y/m/d'), $post->post_date);
+            // Works on vars
+            $title = trim($obj['title']) ? $obj['title'] : parent::t('wordpress.ajax.no_title', $this->textdomain);
+            $link = $obj['link'];
 
             // Build HTML ~ Content
             $html .= '<tr class="'.trim('found-posts '.$alt).'">';
             $html .= '<td class="found-radio">';
-            $html .= '<input type="radio" id="found-'.$post->ID.'" name="post_id" value="'.esc_attr($post->ID).'" />';
+            $html .= '<input type="radio" id="found-'.$key.'" name="key" value="'.esc_attr($key).'" />';
             $html .= '</td>';
-            $html .= '<td class="title" data-l="'.get_permalink($post->ID).'">';
-            $html .= '<label for="found-'.$post->ID.'">'.esc_html($title).'</label></td>';
+            $html .= '<td class="found-title">';
+            $html .= '<label for="found-'.$key.'">'.esc_html($title).'</label>';
+            $html .= '<br/><a href="'.$link.'" target="_blank"><small>'.$link.'</small></a>';
             $html .= '</td>';
-            $html .= '<td class="no-break">'.esc_html($posttypes[$post->post_type]->labels->singular_name).'</td>';
-            $html .= '<td class="no-break">'.esc_html($time).'</td>';
-            $html .= '<td class="no-break">'.esc_html($status).'</td>';
             $html .= '</tr>';
         }
 
@@ -155,6 +153,8 @@ class Wordpress extends Field
             't_modalclose_label' => parent::t('wordpress.modal.close', $this->textdomain),
             't_modalsearch_label' => parent::t('wordpress.modal.search', $this->textdomain),
             't_modalsubmit_label' => parent::t('wordpress.modal.submit', $this->textdomain),
+
+            't_ajaxerror_label' => parent::t('wordpress.ajax.no_items_found', $this->textdomain),
         ];
     }
 
@@ -168,28 +168,6 @@ class Wordpress extends Field
      */
     protected function getVars($value, $contents) : array
     {
-        // Available types
-        $types = [
-            'categories' => 'category',
-            'category' => 'category',
-            'menus' => 'menu',
-            'menu' => 'menu',
-            'pages' => 'page',
-            'page' => 'page',
-            'posts' => 'post',
-            'post' => 'post',
-            'posttypes' => 'posttype',
-            'posttype' => 'posttype',
-            'tags' => 'tag',
-            'tag' => 'tag',
-            'taxonomies' => 'taxonomy',
-            'taxonomy' => 'taxonomy',
-            'terms' => 'term',
-            'term' => 'term',
-            'users' => 'user',
-            'user' => 'user'
-        ];
-
         // Available mode display
         $modes = ['default', 'extended'];
 
@@ -197,29 +175,14 @@ class Wordpress extends Field
         $vars = $contents;
 
         // Retrieve field value
-        $vars['value'] = !is_array($value) ? [$value] : $value;
+        $vars['value'] = !is_array($value) && !empty($value) ? [$value] : $value;
 
         // Mode
         $vars['mode'] = isset($vars['mode']) ? $vars['mode'] : '';
         $vars['mode'] = in_array($vars['mode'], $modes) ? $vars['mode'] : 'default';
 
         // Check types
-        $vars['type'] = array_key_exists($vars['type'], $types) ? $types[$vars['type']] : 'post';
-
-        // Get the categories
-        $vars['contents'] = $this->getWPContents(
-            $vars['type'],
-            $vars['multiple'],
-            $vars['settings'],
-            $vars['value'],
-            $vars['field']
-        );
-
-        // Field description
-        if (empty($vars['contents'])) {
-            $translate = $vars['multiple'] ? 'wordpress.no_items_found' : 'wordpress.no_item_found';
-            $vars['description'] = sprintf(parent::t($translate, $this->textdomain), $vars['type']).'<br/>'.$vars['description'];
-        }
+        $vars['type'] = array_key_exists($vars['type'], $this->posttypes) ? $this->posttypes[$vars['type']] : 'post';
 
         // Update vars
         return $vars;
@@ -229,14 +192,13 @@ class Wordpress extends Field
      * Get Wordpress contents already registered.
      *
      * @param  string  $type
-     * @param  bool    $multiple
      * @param  array   $settings
-     * @param  int     $post_id
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPContents($type, $multiple = false, $settings = [], $post_id = 0, $field = '') : array
+    protected function getWPContents($type, $settings = [], $field = '', $search = '') : array
     {
         // Access WordPress contents
         $wpcontents = [];
@@ -269,7 +231,7 @@ class Wordpress extends Field
 
         // Get contents
         $function = 'getWP'.$wptype;
-        $wpcontents = $this->$function($settings, $field);
+        $wpcontents = $this->$function($settings, $field, $search);
 
         // Return value
         return $wpcontents;
@@ -283,21 +245,26 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
-     * @param  array   $contents
-     * @param  int     $parent
-     * @param  string  $prefix
+     * @param  string  $search
+     * @param  array   $ctn
+     * @param  int     $pt
+     * @param  string  $pfx
      *
      * @return array
      */
-    protected function getWPCategories($options, $field = 'cat_ID', $contents = [], $parent = 0, $prefix = '') : array
+    protected function getWPCategories($options, $field = 'cat_ID', $search = '', $ctn = [], $pt = 0, $pfx = '') : array
     {
         // Build options
         $args = array_merge([
             'hide_empty' => 0,
             'orderby' => 'name',
             'order' => 'ASC',
-            'parent' => $parent,
+            'parent' => $pt,
         ], $options);
+
+        if (!empty($search)) {
+            $args['search'] = $search;
+        }
 
         // Build request
         $categories_obj = get_categories($args);
@@ -314,15 +281,18 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($cat->$field) ? $cat->$field : $cat->cat_ID;
 
                 // Get the id and the name
-                $contents[$item] = $prefix.$cat->cat_name;
+                $ctn[$item] = [
+                    'title' => $pfx.$cat->cat_name,
+                    'link'  => get_category_link($cat->cat_ID),
+                ];
 
                 // Get children
-                $contents = $this->getWPCategories($options, $field, $contents, $cat->cat_ID, $prefix.'- ');
+                $ctn = $this->getWPCategories($options, $field, $ctn, $cat->cat_ID, $pfx.'- ');
             }
         }
 
         // Return all values in a well formatted way
-        return $contents;
+        return $ctn;
     }
 
     /**
@@ -333,10 +303,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array   $wpcontents
      */
-    protected function getWPMenus($options, $field = 'term_id') : array
+    protected function getWPMenus($options, $field = 'term_id', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -346,6 +317,10 @@ class Wordpress extends Field
             'hide_empty' => false,
             'orderby' => 'none'
         ], $options);
+
+        if (!empty($search)) {
+            $args['search'] = $search;
+        }
 
         // Build request
         $menus_obj = wp_get_nav_menus($args);
@@ -362,7 +337,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($menu->$field) ? $menu->$field : $menu->term_id;
 
                 // Get the id and the name
-                $contents[$item] = $menu->name;
+                $contents[$item] = [
+                    'title' => $menu->name,
+                    'link'  => admin_url('nav-menus.php?menu='.$menu->term_id),
+                ];
             }
         }
 
@@ -378,10 +356,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPPages($options, $field = 'ID') : array
+    protected function getWPPages($options, $field = 'ID', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -391,8 +370,14 @@ class Wordpress extends Field
             'sort_column' => 'post_parent,menu_order'
         ], $options);
 
+        $args['post_type'] = 'page';
+
+        if (!empty($search)) {
+            $args['s'] = $search;
+        }
+
         // Build request
-        $pages_obj = get_pages($args);
+        $pages_obj = get_posts($args);
 
         // Iterate on pages
         if (!empty($pages_obj)) {
@@ -406,7 +391,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($pag->$field) ? $pag->$field : $pag->ID;
 
                 // Get the id and the name
-                $contents[$item] = $pag->post_title;
+                $contents[$item] = [
+                    'title' => $pag->post_title,
+                    'link'  => get_page_link($pag->ID),
+                ];
             }
         }
 
@@ -422,10 +410,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPPosts($options, $field = 'ID') : array
+    protected function getWPPosts($options, $field = 'ID', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -436,8 +425,12 @@ class Wordpress extends Field
             'post_status' => 'publish'
         ], $options);
 
+        if (!empty($search)) {
+            $args['s'] = $search;
+        }
+
         // Build request
-        $posts_obj = wp_get_recent_posts($args, OBJECT);
+        $posts_obj = get_posts($args);
 
         // Iterate on posts
         if (!empty($posts_obj)) {
@@ -451,7 +444,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($pos->$field) ? $pos->$field : $pos->ID;
 
                 // Get the id and the name
-                $contents[$item] = $pos->post_title;
+                $contents[$item] = [
+                    'title' => $pos->post_title,
+                    'link'  => get_permalink($pos->ID),
+                ];
             }
         }
 
@@ -467,10 +463,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPPosttypes($options, $field = 'name') : array
+    protected function getWPPosttypes($options, $field = 'name', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -478,8 +475,13 @@ class Wordpress extends Field
         // Build options
         $args = array_merge([], $options);
 
+        if (!empty($search)) {
+            $args['name'] = $search;
+            $args['singular_name'] = $search;
+        }
+
         // Build request
-        $types_obj = get_post_types($args, 'object');
+        $types_obj = get_post_types($args, 'objects', 'or');
 
         // Iterate on posttypes
         if (!empty($types_obj)) {
@@ -488,7 +490,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($typ->$field) ? $typ->$field : $typ->name;
 
                 // Get the the name
-                $contents[$item] = $typ->labels->name.' ('.$typ->name.')';
+                $contents[$item] = [
+                    'title' => $typ->labels->name.' ('.$typ->name.')',
+                    'link'  => admin_url('edit.php?post_type='.$typ->name),
+                ];
             }
         }
 
@@ -504,10 +509,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPTags($options, $field = 'term_id') : array
+    protected function getWPTags($options, $field = 'term_id', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -515,6 +521,8 @@ class Wordpress extends Field
         // Build options
         $args = array_merge([], $options);
         $id = isset($args['ID']) ? $args['ID'] : 0;
+
+        // No search allowed for now.
 
         // Build request
         $tags_obj = get_the_tags($id);
@@ -526,7 +534,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($tag->$field) ? $tag->$field : $tag->term_id;
 
                 // Get the id and the name
-                $contents[$item] = $tag->name;
+                $contents[$item] = [
+                    'title' => $tag->name,
+                    'link'  => get_term_link($tag->term_id),
+                ];
             }
         }
 
@@ -543,10 +554,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPTaxonomies($options, $field = '') : array
+    protected function getWPTaxonomies($options, $field = '', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -556,8 +568,13 @@ class Wordpress extends Field
             'public' => 1
         ], $options);
 
+        if (!empty($search)) {
+            $args['name'] = $search;
+            $args['singular_name'] = $search;
+        }
+
         // Build request
-        $taxs_obj = get_taxonomies($args);
+        $taxs_obj = get_taxonomies($args, 'objects', 'or');
 
         // Iterate on tags
         if (!empty($taxs_obj)) {
@@ -569,7 +586,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($taxo->$field) ? $taxo->$field : $tax;
 
                 // Get the id and the name
-                $contents[$item] = $taxo->labels->name.' ('.$taxo->name.')';
+                $contents[$item] = [
+                    'title' => $taxo->labels->name.' ('.$taxo->name.')',
+                    'link'  => admin_url('edit-tags.php?taxonomy='.$taxo->name),
+                ];
             }
         }
 
@@ -585,10 +605,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPTerms($options, $field = 'term_id') : array
+    protected function getWPTerms($options, $field = 'term_id', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -597,6 +618,10 @@ class Wordpress extends Field
         $args = array_merge([
             'hide_empty' => false,
         ], $options);
+
+        if (!empty($search)) {
+            $args['search'] = $search;
+        }
 
         // Build request
         $terms_obj = get_terms($args);
@@ -608,7 +633,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($term->$field) ? $term->$field : $term->term_id;
 
                 // Get the id and the name
-                $contents[$item] = $term->name;
+                $contents[$item] = [
+                    'title' => $term->name,
+                    'link'  => get_term_link($term->term_id),
+                ];
             }
         }
 
@@ -625,10 +653,11 @@ class Wordpress extends Field
      *
      * @param  array   $options
      * @param  string  $field
+     * @param  string  $search
      *
      * @return array
      */
-    protected function getWPUsers($options, $field = 'ID') : array
+    protected function getWPUsers($options, $field = 'ID', $search = '') : array
     {
         // Build contents
         $contents = [];
@@ -637,6 +666,10 @@ class Wordpress extends Field
         $args = array_merge([
             'role' => '',
         ], $options);
+
+        if (!empty($search)) {
+            $args['search'] = $search;
+        }
 
         // Build request
         $users_obj = get_users($args);
@@ -648,7 +681,10 @@ class Wordpress extends Field
                 $item = !empty($field) && isset($user->$field) ? $user->$field : $user->ID;
 
                 // Get the id and the name
-                $contents[$item] = $user->display_name;
+                $contents[$item] = [
+                    'title' => $user->display_name,
+                    'link'  => get_edit_user_link($user->ID),
+                ];
             }
         }
 
