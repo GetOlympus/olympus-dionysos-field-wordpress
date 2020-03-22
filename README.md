@@ -39,8 +39,19 @@ return \GetOlympus\Dionysos\Field\Wordpress::build('my_wordpress_field_id', [
      * Texts definition
      * @see the `Texts definition` section below
      */
-    't_mostused' => 'Most used',
-    't_search'   => 'Search',
+    't_addblock_title' => 'Click on the edit button',
+    't_addblock_description' => 'Click on the "+" button to add your item.',
+    't_addblocks_description' => 'Click on the "+" button to add a new item.',
+    't_addblock_label' => 'Add',
+    't_editblock_label' => 'Edit',
+    't_removeblock_label' => 'Remove',
+
+    't_modaltitle_label' => 'Choose a content',
+    't_modalclose_label' => 'Close',
+    't_modalsearch_label' => 'Search',
+    't_modalsubmit_label' => 'Select',
+
+    't_ajaxerror_label' => 'No item found',
 ]);
 ```
 
@@ -64,8 +75,17 @@ Notes:
 
 | Code | Default value | Definition |
 | ---- | ------------- | ---------- |
-| `t_mostused` | Most used | Used as a notice to help users to user multiselect field |
-| `t_search` | Search | Used as a notice to help users to user multiselect field |
+| `t_addblock_title` | Click on the edit button | Used as a notice to help users when there is no label yet |
+| `t_addblock_description` | Click on the "+" button to add your item. | Used as a notice to help users in single format |
+| `t_addblocks_description` | Click on the "+" button to add a new item. | Used as a notice to help users in multiple format |
+| `t_addblock_label` | Add | Add button label |
+| `t_editblock_label` | Edit | Edit button label |
+| `t_removeblock_label` | Remove | Remove button label |
+| `t_modaltitle_label` | Choose a content | Modal title |
+| `t_modalclose_label` | Close | Modal close button label |
+| `t_modalsearch_label` | Search | Modal search button label |
+| `t_modalsubmit_label` | Select | Modal select button label |
+| `t_ajaxerror_label` | No item found | Error message on ajax failure |
 
 ## Accepted type
 
@@ -100,15 +120,15 @@ if (!empty($wordpress)) {
 
 ## Release History
 
+0.0.19
+- Fix display and WordPress core functions integration
+
 0.0.18
 - Display now compatible with new Zeus-Core version
 
 0.0.17
 - New Olympus components compatibility
 - Change repository to be a part of Dionysos fields
-
-0.0.16
-- FIX: bug on vars description
 
 ## Contributing
 

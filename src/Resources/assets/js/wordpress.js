@@ -8,6 +8,7 @@
  *      $('.wordpress').dionysosWordpress({
  *          color: '#ffaaaa',               // background color used when deleting a social network
  *          elements: '.listbox',           // node elements
+ *          error: 'no items found.',       // error message on ajax failure
  *          item: 'fieldset',               // child node item
  *          multiple: false,                // define to display multiple elements or not
  *          addbutton: '.add-button',       // node element which is used to add a new item
@@ -15,8 +16,11 @@
  *          removebutton: '.remove-button', // node element which is used to remove item
  *          linkurl: '.link-url',           // node element which contains link element
  *          linklabel: '.link-label',       // node element which contains link label
- *          modal: 'find-posts',            // ---
- *          overlay: '.ui-find-overlay',    // ---
+ *          field: '',                      // field to retrieve from Database
+ *          settings: {},                   // object getter settings
+ *          type: 'post',                   // object type to get
+ *          modal: 'find-posts',            // modal identifier used to match all useful fields
+ *          overlay: '.ui-find-overlay',    // node element which contains overlay
  *          source: 'template-id',          // node script element in DOM containing handlebars JS temlpate
  *      });
  *
@@ -291,8 +295,8 @@
 
             if ($checked.length) {
                 var _val = $checked.val(),
-                    _url = $checked.closest('tr').find('td.title').attr('data-l'),
-                    _txt = $checked.closest('tr').find('td.title').text();
+                    _url = $checked.closest('tr').find('td.found-title a').text(),
+                    _txt = $checked.closest('tr').find('td.found-title label').text();
 
                 // update values
                 _this.$current.find('input[type="hidden"]').val(_val);
@@ -332,8 +336,10 @@
 
         // build post object
         var post = {
+            field: _this.options.field,
             search: _this.$modal.find('.'+_this.options.modal+'-input').val(),
-            type: 'post',
+            settings: _this.options.settings,
+            type: _this.options.type,
             action: _this.options.modal
         };
 
@@ -354,13 +360,13 @@
         }).done(function (x){
             // no results
             if (!x.success) {
-                $response.text(attachMediaBoxL10n.error);
+                $response.text(_this.options.error);
             }
 
             // display data
             $response.html(x.data);
         }).fail(function (){
-            $response.text(attachMediaBoxL10n.error);
+            $response.text(_this.options.error);
         });
     };
 
@@ -374,6 +380,7 @@
                 // configurations
                 color: '#ffaaaa',
                 elements: '.listbox',
+                error: 'no items found.',
                 item: 'fieldset',
                 multiple: false,
                 // buttons
@@ -383,6 +390,10 @@
                 // link
                 linkurl: '.link-url',
                 linklabel: '.link-label',
+                // modal settings
+                field: '',
+                settings: {},
+                type: 'post',
                 // sources
                 modal: 'find-posts',
                 overlay: '.ui-find-overlay',
