@@ -370,15 +370,14 @@ class Wordpress extends Field
             'sort_column' => 'post_parent,menu_order'
         ], $options);
 
-        /**
-         * @todo
-         */
+        $args['post_type'] = 'page';
+
         if (!empty($search)) {
-            $args['search'] = $search;
+            $args['s'] = $search;
         }
 
         // Build request
-        $pages_obj = get_pages($args);
+        $pages_obj = get_posts($args);
 
         // Iterate on pages
         if (!empty($pages_obj)) {
@@ -523,12 +522,7 @@ class Wordpress extends Field
         $args = array_merge([], $options);
         $id = isset($args['ID']) ? $args['ID'] : 0;
 
-        /**
-         * @todo
-         */
-        if (!empty($search)) {
-            $args['s'] = $search;
-        }
+        // No search allowed for now.
 
         // Build request
         $tags_obj = get_the_tags($id);
