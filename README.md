@@ -120,15 +120,14 @@ if (!empty($wordpress)) {
 
 ## Release History
 
+0.0.20
+- Add wp-util WordPress integration
+
 0.0.19
 - Fix display and WordPress core functions integration
 
 0.0.18
 - Display now compatible with new Zeus-Core version
-
-0.0.17
-- New Olympus components compatibility
-- Change repository to be a part of Dionysos fields
 
 ## Contributing
 

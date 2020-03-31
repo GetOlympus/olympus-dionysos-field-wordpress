@@ -19,6 +19,11 @@ class Wordpress extends Field
     /**
      * @var array
      */
+    protected $adminscripts = ['wp-util'];
+
+    /**
+     * @var array
+     */
     protected $posttypes = [
         'categories' => 'category',
         'category' => 'category',
