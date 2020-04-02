@@ -76,9 +76,9 @@ class Wordpress extends Field
     {
         // Get contents
         $search   = wp_unslash($request['search']);
-        $field    = $request['field'];
-        $settings = $request['settings'];
-        $type     = $request['type'];
+        $field    = isset($request['field']) ? $request['field'] : '';
+        $settings = isset($request['settings']) ? $request['settings'] : [];
+        $type     = isset($request['type']) ? $request['type'] : 'post';
 
         // Check types
         if (!array_key_exists($type, $this->posttypes)) {
