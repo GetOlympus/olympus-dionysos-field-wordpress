@@ -1,4 +1,12 @@
+<img src="https://github.com/GetOlympus/olympus-dionysos-field-wordpress/blob/master/assets/field-wordpress.png" align="left" />
+
 # Dionysos Wordpress Field
+
+[![Olympus Component][olympus-image]][olympus-url]
+[![CodeFactor Grade][codefactor-image]][codefactor-url]
+[![Packagist Version][packagist-image]][packagist-url]
+[![MIT][license-image]][license-blob]
+
 > This component is a part of the **Olympus Dionysos fields** for **WordPress**.
 > It uses a duplicate `findPosts` WordPress custom modal to manage field.
 
@@ -8,16 +16,9 @@ composer require getolympus/olympus-dionysos-field-wordpress
 
 ---
 
-[![Olympus Component][olympus-image]][olympus-url]
-[![CodeFactor Grade][codefactor-image]][codefactor-url]
-[![Packagist Version][packagist-image]][packagist-url]
-[![MIT][license-image]][license-blob]
+## Table of contents
 
----
-
-<p align="center">
-    <img src="https://github.com/GetOlympus/olympus-dionysos-field-wordpress/blob/master/assets/field-wordpress-64.png" />
-</p>
+[Field initialization](#field-initialization) • [Variables definitions](#variables-definitions) • [Texts definition](#texts-definition) • [Accepted types](#accepted-types) • [Retrive data](#retrive-data) • [Release history](#release-history) • [Contributing](#contributing)
 
 ---
 
@@ -58,13 +59,13 @@ return \GetOlympus\Dionysos\Field\Wordpress::build('my_wordpress_field_id', [
 ## Variables definitions
 
 | Variable      | Type    | Default value if not set | Accepted values |
-| ------------- | ------- | ------------------------ | --------------- |
+| :------------ | :------ | :----------------------- | :-------------- |
 | `title`       | String  | `'Code'` | *empty* |
 | `default`     | Array   | *empty* | *empty* |
 | `description` | String  | *empty* | *empty* |
 | `field`       | String  | `ID` | depends on `type` value |
 | `multiple`    | Boolean | `false` | `true` or `false` |
-| `type`        | String  | `post` | see [Accepted type](#accepted-type) |
+| `type`        | String  | `post` | see [Accepted types](#accepted-types) |
 | `settings`    | Array   | *empty* | depends on `type` value |
 
 Notes:
@@ -74,7 +75,7 @@ Notes:
 ## Texts definition
 
 | Code | Default value | Definition |
-| ---- | ------------- | ---------- |
+| :--- | :------------ | :--------- |
 | `t_addblock_title` | Click on the edit button | Used as a notice to help users when there is no label yet |
 | `t_addblock_description` | Click on the "+" button to add your item. | Used as a notice to help users in single format |
 | `t_addblocks_description` | Click on the "+" button to add a new item. | Used as a notice to help users in multiple format |
@@ -87,7 +88,7 @@ Notes:
 | `t_modalsubmit_label` | Select | Modal select button label |
 | `t_ajaxerror_label` | No item found | Error message on ajax failure |
 
-## Accepted type
+## Accepted types
 
 * `categories` or `category` (see `get_categories` on [WordPress reference](https://developer.wordpress.org/reference/functions/get_categories/) for `field` and `settings` variables)
 * `menus` or `menu` (see `wp_get_nav_menus` on [WordPress reference](https://developer.wordpress.org/reference/functions/wp_get_nav_menus/) for `field` and `settings` variables)
@@ -118,16 +119,13 @@ if (!empty($wordpress)) {
 }
 ```
 
-## Release History
+## Release history
 
-0.0.21
-- Add checks on ajax call
-
-0.0.20
-- Add wp-util WordPress integration
-
-0.0.19
-- Fix display and WordPress core functions integration
+| Version | Note |
+| :------ | :--- |
+| 0.0.21  | Add checks on ajax call |
+| 0.0.20  | Add wp-util WordPress integration |
+| 0.0.19  | Fix display and WordPress core functions integration |
 
 ## Contributing
 
